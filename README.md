@@ -1,7 +1,7 @@
-# 🌸 Femora - AI-Driven Women's Wellbeing Ecosystem
+# Femora - AI-Driven Women's Wellbeing Ecosystem
 
 <div align="center">
-  <img src="assets/images/logo.png" alt="Femora Logo" width="200"/>
+ 
   <p><i>Your intelligent companion for period tracking, pregnancy monitoring, mental wellness, and community support</i></p>
   
   ![Flutter](https://img.shields.io/badge/Flutter-3.16+-02569B?style=flat&logo=flutter)
@@ -13,46 +13,46 @@
 
 ---
 
-## 📋 Description
+## Description
 
 Femora is an intelligent mobile application that integrates period tracking, pregnancy monitoring, mental health assessment, safety features, and community support through the **Femora Intelligence Engine (FIE)** - our proprietary AI system that provides predictive analytics and personalized health insights. This platform empowers women to take control of their health journey with data-driven insights and compassionate community support.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 📅 **Period Tracker**
+### **Period Tracker**
 - Intelligent cycle prediction with confidence scores
 - Flow level and symptom logging
 - PMS emotional alerts based on cycle phase
 - Exportable cycle history reports
 
-### 🤰 **Pregnancy Journey**
+### **Pregnancy Journey**
 - Week-by-week pregnancy tracking
 - Trimester-specific health support
 - Symptom monitoring with AI insights
 - Baby development milestones
 
-### 🧘 **Mental Health Hub**
+### **Mental Health Hub**
 - Mood tracking with emoji + slider interface
 - Sleep quality logging
 - ESI (Emotional Stability Index) calculations
 - HECS (Hormonal-Emotional Correlation Score)
 - Predictive emotional low alerts
 
-### 🛡️ **Safety Center**
+### **Safety Center**
 - SOS emergency activation
 - Trusted contacts management
 - Live location sharing
 - Quick access to crisis resources
 
-### 👥 **Community Platform**
+### **Community Platform**
 - Anonymous discussion forums
 - Category-based feeds (Period, Pregnancy, Mental Health)
 - Content library with articles
 - Peer support groups
 
-### 🧠 **Femora Intelligence Engine (FIE)**
+### **Femora Intelligence Engine (FIE)**
 Our central AI core that:
 - **Analyzes** cross-module data patterns
 - **Predicts** period dates, emotional dips, and health events
@@ -62,7 +62,7 @@ Our central AI core that:
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 ### Frontend
 - **Flutter 3.16+** - Cross-platform mobile framework
@@ -93,7 +93,7 @@ Our central AI core that:
 
 ---
 
-## 🚀 Setup and Installation
+## Setup and Installation
 
 ### Prerequisites
 
@@ -237,7 +237,7 @@ open ios/Runner.xcworkspace
 ```
 
 
-## 🔄 CI/CD
+##  CI/CD
 
 Use **GitHub Actions** for continuous integration and deployment:
 
@@ -382,43 +382,8 @@ Use **GitHub Actions** for continuous integration and deployment:
  ┗ 📜 README.md              # AI service documentation
 ```
 
----
 
-## 📝 What to Add in Each Folder?
-
-### 📂 `screens/`
-- Full-page components (LoginScreen, HomeScreen, etc.)
-- One screen per file
-- Named with `_screen.dart` suffix
-
-### 📂 `widgets/`
-- Reusable UI components
-- Organized by type (buttons, cards, forms)
-- Can be used across multiple screens
-
-### 📂 `models/`
-- Data classes representing entities
-- Include `fromJson()` and `toJson()` methods
-- Follow naming: `entity_model.dart`
-
-### 📂 `services/`
-- API calls and external integrations
-- Business logic separate from UI
-- Supabase, Firebase, or REST API calls
-
-### 📂 `providers/`
-- State management with Provider
-- Separate providers per feature/module
-- Handle data fetching and state updates
-
-### 📂 `utils/`
-- Helper functions
-- Constants and configurations
-- Date formatting, validators, etc.
-
----
-
-## 🧪 Testing
+## Testing
 
 ### Flutter Tests
 ```bash
@@ -440,27 +405,27 @@ pytest
 
 ---
 
-## 🗺️ Project Roadmap
+##  Project Roadmap
 
-### Phase 1: Foundation (Weeks 1-2) ✅
+### Phase 1: Foundation (Weeks 1-2) 
 - [x] Project setup and architecture
 - [x] Authentication system
 - [x] Period tracker module
 - [x] Basic home dashboard
 
-### Phase 2: Core Features (Weeks 3-4) 🚧
+### Phase 2: Core Features (Weeks 3-4) 
 - [ ] Pregnancy tracker
 - [ ] Mental health module (mood + sleep)
 - [ ] Community feed
 - [ ] Safety center
 
-### Phase 3: Intelligence (Weeks 5-6) 📋
+### Phase 3: Intelligence (Weeks 5-6) 
 - [ ] FIE integration
 - [ ] Predictive analytics
 - [ ] Cross-module intelligence
 - [ ] Risk detection
 
-### Phase 4: Polish & Launch (Week 7) 📋
+### Phase 4: Polish & Launch (Week 7) 
 - [ ] UI/UX refinements
 - [ ] Performance optimization
 - [ ] Testing and bug fixes
@@ -468,25 +433,25 @@ pytest
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👤 Author
+## Author
 
 **Meegoda Dilakna**
-- 🎓 University: Plymouth  University
-- 📚 Program: Final Year Software Engineering
-- 👨‍🏫 Project Supervisor: Miss.Dulanjali Wijesekara
-- 📧 Email: 10952548@students.plymouth.ac.uk
-- 🔗 LinkedIn: linkedin.com/in/janudi-meegoda
-- 💻 GitHub: @djdJANU(https://github.com/djdJANU)
+-  University: Plymouth  University
+-  Program: Final Year Software Engineering
+-  Project Supervisor: Miss.Dulanjali Wijesekara
+-  Email: 10952548@students.plymouth.ac.uk
+-  LinkedIn: linkedin.com/in/janudi-meegoda
+-  GitHub: @djdJANU(https://github.com/djdJANU)
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Anthropic** for AI development assistance
 - **Flutter Team** for excellent framework and documentation
@@ -497,21 +462,21 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 📊 Project Status
+## Project Status
 
 **Current Version:** v0.1.0 (Development)  
-**Status:** 🚧 In Active Development  
+**Status:**  In Active Development  
 **Target Completion:** April 20, 2026  
 **Last Updated:** February 13, 2026
 
 ---
 
-## 📞 Support & Contact
+## Support & Contact
 
 For questions, issues, or suggestions:
-- 📧 Email: janudimeegoda@gmail.com
-- 🐛 Issues: [GitHub Issues](https://github.com/djdJANU/femora-app/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/djdJANU/femora-app/discussions)
+- Email: janudimeegoda@gmail.com
+- Issues: [GitHub Issues](https://github.com/djdJANU/femora-app/issues)
+- Discussions: [GitHub Discussions](https://github.com/djdJANU/femora-app/discussions)
 
 ---
 
