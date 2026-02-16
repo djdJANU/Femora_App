@@ -117,3 +117,15 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# Windows system files
+desktop.ini
+Thumbs.db
+
+# Environment variables
+.env
+*.env
+
+# Flutter build artifacts
+build/
+.dart_tool/
