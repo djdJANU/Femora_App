@@ -18,7 +18,12 @@
 Femora is an intelligent mobile application that integrates period tracking, pregnancy monitoring, mental health assessment, safety features, and community support through the **Femora Intelligence Engine (FIE)** - our proprietary AI system that provides predictive analytics and personalized health insights. This platform empowers women to take control of their health journey with data-driven insights and compassionate community support.
 
 ---
+## Architecture Documentation
 
+- docs/PROJECT_CONTEXT.md
+- docs/ARCHITECTURE_GUIDELINES.md
+  
+---
 ## Key Features
 
 ### **Period Tracker**
