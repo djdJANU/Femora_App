@@ -295,9 +295,11 @@ app.post('/api/auth/login',
 );
 
 // ── Auth — POST /api/auth/logout ─────────────────────────────────────────────
-app.post('/api/auth/logout', requireAuth, apiLimiter, async (_req, res, next) => {
+app.post('/api/auth/logout', requireAuth, apiLimiter, async (req, res, next) => {
   try {
-    await supabase.auth.signOut();
+    // Use admin API to sign out the authenticated user and revoke all their sessions
+    const { error } = await supabase.auth.admin.signOut(req.user.id);
+    if (error) throw error;
     res.json({ status: 200, message: 'Logged out.' });
   } catch (err) { next(err); }
 });
@@ -305,7 +307,7 @@ app.post('/api/auth/logout', requireAuth, apiLimiter, async (_req, res, next) =>
 // ── Profile — GET /api/profile ────────────────────────────────────────────────
 app.get('/api/profile', requireAuth, apiLimiter, async (req, res, next) => {
   try {
-    const { data, error } = await supabase.from('user_profiles')
+    const { data, error } = await supabase.from('profiles')
       .select('full_name, date_of_birth, profile_avatar, onboarding_completed')
       .eq('id', req.user.id).single();
 
@@ -330,7 +332,7 @@ app.patch('/api/profile', requireAuth, writeLimiter,
       if (req.body.date_of_birth !== undefined)        updates.date_of_birth        = req.body.date_of_birth.toISOString().split('T')[0];
       if (req.body.onboarding_completed !== undefined) updates.onboarding_completed = req.body.onboarding_completed;
 
-      const { data, error } = await supabase.from('user_profiles')
+      const { data, error } = await supabase.from('profiles')
         .update(updates).eq('id', req.user.id).select().single();
 
       if (error) { console.error('[Profile/update]', error.message); return res.status(500).json({ status: 500, error: 'Server Error', message: 'Update failed.' }); }

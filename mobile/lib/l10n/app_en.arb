@@ -1,0 +1,134 @@
+{
+  "@@locale": "en",
+
+  "@@last_modified": "2026-03-14",
+
+  "@@comment": "Femora — English strings. This is the master file. All keys must exist here first.",
+
+  "appName": "Femora",
+
+  "continueButton": "Continue",
+  "saveButton": "Save",
+  "cancelButton": "Cancel",
+  "deleteButton": "Delete",
+  "backButton": "Back",
+  "yesButton": "Yes",
+  "noButton": "No",
+  "doneButton": "Done",
+  "skipButton": "Skip",
+  "retryButton": "Try Again",
+
+  "languageSelectionTitle": "Choose Your Language",
+  "languageSelectionSubtitle": "You can change this anytime in Settings",
+  "languageEnglish": "English",
+  "languageSinhala": "සිංහල",
+  "languageTamil": "தமிழ்",
+
+  "wellbeingTabTitle": "Mental Wellbeing",
+  "wellbeingDashboardGreeting": "How are you feeling today?",
+  "wellbeingDashboardSubtitle": "Your mental health matters. We're here for you.",
+
+  "phq2ScreenTitle": "Quick Check-In",
+  "phq2Instruction": "Over the last 2 weeks, how often have you been bothered by the following?",
+  "phq2Q1": "Little interest or pleasure in doing things",
+  "phq2Q2": "Feeling down, depressed, or hopeless",
+  "phq2Option0": "Not at all",
+  "phq2Option1": "Several days",
+  "phq2Option2": "More than half the days",
+  "phq2Option3": "Nearly every day",
+  "phq2ResultLow": "You seem to be doing well. Keep taking care of yourself.",
+  "phq2ResultMild": "It looks like things have been a bit difficult lately. The tools below may help.",
+  "phq2ResultHigh": "It sounds like you've been struggling. Please know you are not alone — support is available.",
+  "phq2RetakePrompt": "It's been 2 weeks. Would you like to do a quick check-in?",
+  "phq2Badge": "Wellness Check",
+
+  "moodTrackerTitle": "Today's Mood",
+  "moodTrackerPrompt": "How are you feeling right now?",
+  "moodTrackerNoteHint": "Add a note (optional)",
+  "moodTrackerSaved": "Mood logged ✓",
+  "moodHappy": "Happy",
+  "moodCalm": "Calm",
+  "moodAnxious": "Anxious",
+  "moodSad": "Sad",
+  "moodAngry": "Angry",
+  "moodTired": "Tired",
+  "moodInsightsTitle": "Your Mood This Week",
+  "moodInsightsNoData": "Log your mood for 7 days to see patterns here.",
+  "moodInsightFrequent": "You've been feeling {mood} most this week.",
+  "@moodInsightFrequent": {
+    "placeholders": {
+      "mood": { "type": "String" }
+    }
+  },
+
+  "breathingTitle": "Breathing Exercise",
+  "breathingSubtitle": "4-7-8 Technique",
+  "breathingInhale": "Inhale",
+  "breathingHold": "Hold",
+  "breathingExhale": "Exhale",
+  "breathingInhaleSeconds": "Breathe in for 4 seconds",
+  "breathingHoldSeconds": "Hold for 7 seconds",
+  "breathingExhaleSeconds": "Breathe out for 8 seconds",
+  "breathingStart": "Begin",
+  "breathingStop": "Stop",
+  "breathingComplete": "Well done. Take a moment to notice how you feel.",
+  "breathingRounds": "{count} rounds",
+  "@breathingRounds": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "musicTitle": "Calm Music",
+  "musicSubtitle": "Curated playlists for your wellbeing",
+  "musicCategorySleep": "Sleep",
+  "musicCategoryAnxiety": "Anxiety Relief",
+  "musicCategoryFocus": "Focus",
+  "musicCategoryMeditation": "Meditation",
+  "musicOpenLink": "Open in YouTube",
+
+  "libraryTitle": "Library",
+  "librarySearchHint": "Search articles...",
+  "librarySave": "Save",
+  "librarySaved": "Saved",
+  "libraryShare": "Share",
+  "libraryRelatedTopics": "Related Topics",
+  "libraryCategories": "Categories",
+  "libraryCategoryMentalHealth": "Mental Health",
+  "libraryCategoryRelationships": "Relationships",
+  "libraryCategorySelfCare": "Self Care",
+  "libraryCategoryNutrition": "Nutrition",
+  "libraryCategoryFitness": "Fitness",
+
+  "sleepTitle": "Sleep Tracker",
+  "sleepQualityPrompt": "How did you sleep last night?",
+  "sleepQuality1": "Very Poor",
+  "sleepQuality2": "Poor",
+  "sleepQuality3": "Fair",
+  "sleepQuality4": "Good",
+  "sleepQuality5": "Excellent",
+  "sleepHoursHint": "Hours slept (e.g. 7.5)",
+  "sleepNoteHint": "Any notes about your sleep?",
+  "sleepSaved": "Sleep log saved ✓",
+  "sleepAverage": "7-day average: {hours} hrs",
+  "@sleepAverage": {
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+
+  "crisisTitle": "Need Support?",
+  "crisisSubtitle": "You are not alone. Trained counsellors are available right now.",
+  "crisisCallButton": "Call Now",
+  "crisisNIMHName": "NIMH Sri Lanka",
+  "crisisNIMHNumber": "1926",
+  "crisisNIMHDescription": "National Institute of Mental Health — free, 24/7",
+  "crisisSahanayaName": "Sahanaya",
+  "crisisSahanayaNumber": "011-2696666",
+  "crisisSahanayaDescription": "Counselling and emotional support",
+  "crisisBannerMild": "Feeling overwhelmed? You're not alone.",
+  "crisisBannerHigh": "It looks like you may need some support. Please reach out.",
+  "crisisBannerLink": "See support resources →",
+  "crisisEncouragement": "Reaching out is a sign of strength, not weakness.",
+  "crisisPrivacyNote": "These calls are confidential. Your safety and privacy matter."
+}

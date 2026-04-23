@@ -1,0 +1,134 @@
+{
+  "@@locale": "ta",
+
+  "@@last_modified": "2026-03-14",
+
+  "@@comment": "Femora — Tamil strings. KEY AREAS fully translated: PHQ-2, Mood Tracker, Crisis Resources. All other strings marked [NEEDS TRANSLATION] — replace before production deployment.",
+
+  "appName": "Femora",
+
+  "continueButton": "தொடரவும்",
+  "saveButton": "சேமிக்கவும்",
+  "cancelButton": "ரத்து செய்யவும்",
+  "deleteButton": "நீக்கவும்",
+  "backButton": "திரும்பு",
+  "yesButton": "ஆம்",
+  "noButton": "இல்லை",
+  "doneButton": "முடிந்தது",
+  "skipButton": "தவிர்க்கவும்",
+  "retryButton": "மீண்டும் முயற்சிக்கவும்",
+
+  "languageSelectionTitle": "உங்கள் மொழியை தேர்ந்தெடுக்கவும்",
+  "languageSelectionSubtitle": "இதை நீங்கள் எப்போதும் அமைப்புகளில் மாற்றலாம்",
+  "languageEnglish": "English",
+  "languageSinhala": "සිංහල",
+  "languageTamil": "தமிழ்",
+
+  "wellbeingTabTitle": "மன நலன்",
+  "wellbeingDashboardGreeting": "இன்று நீங்கள் எப்படி உணர்கிறீர்கள்?",
+  "wellbeingDashboardSubtitle": "உங்கள் மன ஆரோக்கியம் முக்கியம். நாங்கள் உங்களுடன் இருக்கிறோம்.",
+
+  "phq2ScreenTitle": "விரைவு சோதனை",
+  "phq2Instruction": "கடந்த 2 வாரங்களில், பின்வரும் பிரச்சனைகளால் நீங்கள் எவ்வளவு அடிக்கடி தொந்தரவு செய்யப்பட்டீர்கள்?",
+  "phq2Q1": "செயல்களில் ஆர்வம் அல்லது மகிழ்ச்சி குறைவாக இருப்பது",
+  "phq2Q2": "சோர்வாக, மனச்சோர்வாக அல்லது நம்பிக்கையற்றதாக உணர்வது",
+  "phq2Option0": "ஒருபோதும் இல்லை",
+  "phq2Option1": "சில நாட்கள்",
+  "phq2Option2": "பாதிக்கும் மேற்பட்ட நாட்கள்",
+  "phq2Option3": "கிட்டத்தட்ட ஒவ்வொரு நாளும்",
+  "phq2ResultLow": "நீங்கள் நன்றாக இருப்பதாக தெரிகிறது. உங்களை கவனித்துக்கொள்ளுங்கள்.",
+  "phq2ResultMild": "சமீபத்தில் விஷயங்கள் கொஞ்சம் கடினமாக இருந்தது போல் தெரிகிறது. கீழே உள்ள கருவிகள் உதவலாம்.",
+  "phq2ResultHigh": "நீங்கள் கஷ்டப்படுவதாக தெரிகிறது. நீங்கள் தனியாக இல்லை என்பதை தயவுசெய்து தெரிந்துகொள்ளுங்கள் — உதவி கிடைக்கும்.",
+  "phq2RetakePrompt": "2 வாரங்கள் ஆகிவிட்டன. விரைவு சோதனை செய்ய விரும்புகிறீர்களா?",
+  "phq2Badge": "ஆரோக்கிய சோதனை",
+
+  "moodTrackerTitle": "இன்றைய மனநிலை",
+  "moodTrackerPrompt": "இப்போது நீங்கள் எப்படி உணர்கிறீர்கள்?",
+  "moodTrackerNoteHint": "குறிப்பு சேர்க்கவும் (விருப்பமானால்)",
+  "moodTrackerSaved": "மனநிலை பதிவு செய்யப்பட்டது ✓",
+  "moodHappy": "மகிழ்ச்சி",
+  "moodCalm": "அமைதி",
+  "moodAnxious": "கவலை",
+  "moodSad": "சோகம்",
+  "moodAngry": "கோபம்",
+  "moodTired": "சோர்வு",
+  "moodInsightsTitle": "இந்த வாரம் உங்கள் மனநிலை",
+  "moodInsightsNoData": "வடிவங்களை காண 7 நாட்கள் உங்கள் மனநிலையை பதிவு செய்யுங்கள்.",
+  "moodInsightFrequent": "இந்த வாரம் நீங்கள் அதிகமாக {mood} உணர்கிறீர்கள்.",
+  "@moodInsightFrequent": {
+    "placeholders": {
+      "mood": { "type": "String" }
+    }
+  },
+
+  "breathingTitle": "சுவாச பயிற்சி",
+  "breathingSubtitle": "4-7-8 முறை",
+  "breathingInhale": "உள்ளிழுக்கவும்",
+  "breathingHold": "வைத்திருக்கவும்",
+  "breathingExhale": "வெளியிடவும்",
+  "breathingInhaleSeconds": "4 விநாடிகள் சுவாசிக்கவும்",
+  "breathingHoldSeconds": "7 விநாடிகள் வைத்திருக்கவும்",
+  "breathingExhaleSeconds": "8 விநாடிகள் வெளியிடவும்",
+  "breathingStart": "தொடங்கு",
+  "breathingStop": "நிறுத்து",
+  "breathingComplete": "சாபாஷ். இப்போது நீங்கள் எப்படி உணர்கிறீர்கள் என்று கவனியுங்கள்.",
+  "breathingRounds": "{count} சுற்றுகள்",
+  "@breathingRounds": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "musicTitle": "அமைதி இசை",
+  "musicSubtitle": "[NEEDS TRANSLATION]",
+  "musicCategorySleep": "தூக்கம்",
+  "musicCategoryAnxiety": "கவலை நிவாரணம்",
+  "musicCategoryFocus": "கவனம்",
+  "musicCategoryMeditation": "தியானம்",
+  "musicOpenLink": "YouTube இல் திறக்கவும்",
+
+  "libraryTitle": "நூலகம்",
+  "librarySearchHint": "கட்டுரைகளை தேடுங்கள்...",
+  "librarySave": "சேமிக்கவும்",
+  "librarySaved": "சேமிக்கப்பட்டது",
+  "libraryShare": "பகிரவும்",
+  "libraryRelatedTopics": "[NEEDS TRANSLATION]",
+  "libraryCategories": "[NEEDS TRANSLATION]",
+  "libraryCategoryMentalHealth": "மன ஆரோக்கியம்",
+  "libraryCategoryRelationships": "[NEEDS TRANSLATION]",
+  "libraryCategorySelfCare": "[NEEDS TRANSLATION]",
+  "libraryCategoryNutrition": "[NEEDS TRANSLATION]",
+  "libraryCategoryFitness": "[NEEDS TRANSLATION]",
+
+  "sleepTitle": "தூக்க கண்காணிப்பு",
+  "sleepQualityPrompt": "நேற்று இரவு நீங்கள் எப்படி தூங்கினீர்கள்?",
+  "sleepQuality1": "மிகவும் மோசம்",
+  "sleepQuality2": "மோசம்",
+  "sleepQuality3": "சாதாரணம்",
+  "sleepQuality4": "நல்லது",
+  "sleepQuality5": "சிறப்பு",
+  "sleepHoursHint": "[NEEDS TRANSLATION]",
+  "sleepNoteHint": "[NEEDS TRANSLATION]",
+  "sleepSaved": "தூக்க பதிவு சேமிக்கப்பட்டது ✓",
+  "sleepAverage": "7 நாள் சராசரி: {hours} மணி.",
+  "@sleepAverage": {
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+
+  "crisisTitle": "உதவி தேவையா?",
+  "crisisSubtitle": "நீங்கள் தனியாக இல்லை. பயிற்சி பெற்ற ஆலோசகர்கள் இப்போது கிடைக்கிறார்கள்.",
+  "crisisCallButton": "இப்போது அழைக்கவும்",
+  "crisisNIMHName": "NIMH இலங்கை",
+  "crisisNIMHNumber": "1926",
+  "crisisNIMHDescription": "தேசிய மனநல நிறுவனம் — இலவசம், 24/7",
+  "crisisSahanayaName": "சஹனய",
+  "crisisSahanayaNumber": "011-2696666",
+  "crisisSahanayaDescription": "ஆலோசனை மற்றும் உணர்வு ஆதரவு",
+  "crisisBannerMild": "அதிகமாக சுமையாக உணர்கிறீர்களா? நீங்கள் தனியாக இல்லை.",
+  "crisisBannerHigh": "உங்களுக்கு கொஞ்சம் ஆதரவு தேவைப்படலாம். தயவுசெய்து தொடர்பு கொள்ளுங்கள்.",
+  "crisisBannerLink": "ஆதரவு வளங்களை பாருங்கள் →",
+  "crisisEncouragement": "உதவி கேட்பது பலவீனத்தின் அறிகுறி அல்ல — அது வலிமையின் அறிகுறி.",
+  "crisisPrivacyNote": "இந்த அழைப்புகள் இரகசியமானவை. உங்கள் பாதுகாப்பும் தனியுரிமையும் முக்கியம்."
+}

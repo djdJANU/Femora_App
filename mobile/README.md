@@ -1,16 +1,55 @@
-# mobile
+# Femora Mobile App
 
-A new Flutter project.
+Flutter client application for Femora — an AI-driven women's wellbeing platform.
 
-## Getting Started
+## Architecture
 
-This project is a starting point for a Flutter application.
+This mobile app follows:
 
-A few resources to get you started if this is your first Flutter project:
+- Clean Architecture principles
+- Feature-based folder structure
+- Supabase for authentication & database
+- Provider for state management
+- Design Token–based theming
+- 8pt spacing system
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Folder Structure
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+lib/
+├── config/        → theme, routes, design tokens  
+├── screens/       → feature screens (auth, home, period, etc.)  
+├── models/        → domain models  
+├── services/      → API & Supabase logic  
+├── providers/     → state management  
+├── utils/         → helpers & extensions  
+
+assets/
+├── fonts/  
+├── images/  
+├── icons/  
+
+## Design System
+
+See:  
+docs/DESIGN_SYSTEM.md  
+
+All UI must use:
+- Color tokens
+- Typography tokens
+- 8pt spacing grid
+- Defined animation durations
+
+Hardcoded values are not allowed.
+
+## Environment
+
+The app uses `.env` for Supabase credentials.
+
+Required:
+SUPABASE_URL  
+SUPABASE_ANON_KEY  
+
+Never commit `.env`.
+
+---
+

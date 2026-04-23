@@ -1,8 +1,7 @@
 # FEMORA — Project Context
 
 ## Overview
-Femora is an AI-driven women's wellbeing mobile application.
-
+FEMORA is an AI-driven women's wellbeing mobile application.
 It helps users:
 - Track menstrual cycles
 - Track mood and mental health

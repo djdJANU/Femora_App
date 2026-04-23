@@ -1,0 +1,134 @@
+{
+  "@@locale": "si",
+
+  "@@last_modified": "2026-03-14",
+
+  "@@comment": "Femora — Sinhala strings. KEY AREAS fully translated: PHQ-2, Mood Tracker, Crisis Resources. All other strings marked [NEEDS TRANSLATION] — replace before production deployment.",
+
+  "appName": "Femora",
+
+  "continueButton": "ඉදිරියට යන්න",
+  "saveButton": "සුරකින්න",
+  "cancelButton": "අවලංගු කරන්න",
+  "deleteButton": "මකා දමන්න",
+  "backButton": "ආපසු",
+  "yesButton": "ඔව්",
+  "noButton": "නැත",
+  "doneButton": "සම්පූර්ණයි",
+  "skipButton": "මඟ හරින්න",
+  "retryButton": "නැවත උත්සාහ කරන්න",
+
+  "languageSelectionTitle": "ඔබගේ භාෂාව තෝරන්න",
+  "languageSelectionSubtitle": "ඔබට මෙය ඕනෑම වේලාවක සැකසුම් වලින් වෙනස් කළ හැකිය",
+  "languageEnglish": "English",
+  "languageSinhala": "සිංහල",
+  "languageTamil": "தமிழ்",
+
+  "wellbeingTabTitle": "මානසික සුවතාව",
+  "wellbeingDashboardGreeting": "ඔබට අද කෙසේද දැනෙන්නේ??",
+  "wellbeingDashboardSubtitle": "ඔබගේ මානසික සෞඛ්‍යය වැදගත්. අපි ඔබට සහාය දීමට මෙහි සිටිමු.",
+
+  "phq2ScreenTitle": "ඉක්මන් පරීක්ෂාව",
+  "phq2Instruction": "පසුගිය සති 2 තුළ, පහත සඳහන් ගැටළු ඔබට කෙතරම් වාරයක් බලපෑවාද?",
+  "phq2Q1": "දේවල් කිරීමට අඩු කැමැත්තක් හෝ සතුට අඩුවීම",
+  "phq2Q2": "කනස්සල්ලෙන්, දුකින් හෝ බලාපොරොත්තු රහිත බවක් දැනීම",
+  "phq2Option0": "කිසිසේත් නැත",
+  "phq2Option1": "කිහිප දිනකදී",
+  "phq2Option2": "දිනවල අඩකට වඩා",
+  "phq2Option3": "සෑම දිනක් පාහේ",
+  "phq2ResultLow": "ඔබ හොඳින් සිටින බව පෙනේ. ඔබව රැකගැනීම දිගටම කරන්න.",
+  "phq2ResultMild": "මෑත කාලයේදී ඔබට ටිකක් අසීරු වූ බව පෙනේ. පහත ඇති උපකරණ ඔබට උපකාරී විය හැක.",
+  "phq2ResultHigh": "ඔබ අරගල කරමින් සිටින බව පෙනේ. ඔබ හුදෙකලා නොවන බව කරුණාකර දන්නා ගන්න — සහාය ලබාගත හැකිය.",
+  "phq2RetakePrompt": "සති 2ක් ගත වී ඇත. ඉක්මන් පරීක්ෂාවක් කිරීමට ඔබ කැමතිද?",
+  "phq2Badge": "සෞඛ්‍ය පරීක්ෂාව",
+
+  "moodTrackerTitle": "අද ඔබගේ මනෝභාවය",
+  "moodTrackerPrompt": "දැන් ඔබට දැනෙන්නේ කෙසේද?",
+  "moodTrackerNoteHint": "සටහනක් එකතු කරන්න (අත්‍යවශ්‍ය නැත)",
+  "moodTrackerSaved": "මනෝභාවය සුරක්ෂිත කරන ලදී ✓",
+  "moodHappy": "සතුටු",
+  "moodCalm": "සන්සුන්",
+  "moodAnxious": "කනස්සල්ල",
+  "moodSad": "දුකින්",
+  "moodAngry": "කෝපයෙන්",
+  "moodTired": "මහන්සි",
+  "moodInsightsTitle": "මෙම සතියේ ඔබගේ මනෝභාවය",
+  "moodInsightsNoData": "දින 7ක් ඔබගේ මනෝභාවය සටහන් කළ පසු මෙහි රටා පෙන්වනු ඇත.",
+  "moodInsightFrequent": "මෙම සතියේ ඔබ වැඩි වශයෙන් {mood} ලෙස දැනී ඇත.",
+  "@moodInsightFrequent": {
+    "placeholders": {
+      "mood": { "type": "String" }
+    }
+  },
+
+  "breathingTitle": "හුස්ම ගැනීමේ අභ්‍යාසය",
+  "breathingSubtitle": "4-7-8 ක්‍රමය",
+  "breathingInhale": "ආශ්වාස කරන්න",
+  "breathingHold": "රඳවා ගන්න",
+  "breathingExhale": "නිශ්වාස කරන්න",
+  "breathingInhaleSeconds": "තත්පර 4ක් හුස්ම ගන්න",
+  "breathingHoldSeconds": "තත්පර 7ක් රඳවා ගන්න",
+  "breathingExhaleSeconds": "තත්පර 8ක් හුස්ම හෙළන්න",
+  "breathingStart": "ආරම්භ කරන්න",
+  "breathingStop": "නවත්වන්න",
+  "breathingComplete": "හොඳයි. ඔබට හැඟෙන ආකාරය නිරීක්ෂණය කිරීමට මොහොතක් ගත කරන්න.",
+  "breathingRounds": "වට {count}",
+  "@breathingRounds": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "musicTitle": "සන්සුන් සංගීතය",
+  "musicSubtitle": "ඔබගේ සුවතාව සඳහා තෝරාගත් ගීත",
+  "musicCategorySleep": "නින්ද",
+  "musicCategoryAnxiety": "කනස්සල්ල අවම කිරීම",
+  "musicCategoryFocus": "අවධානය",
+  "musicCategoryMeditation": "භාවනාව",
+  "musicOpenLink": "YouTube විවෘත කරන්න",
+
+  "libraryTitle": "පුස්තකාලය",
+  "librarySearchHint": "ලිපි සොයන්න...",
+  "librarySave": "සුරකින්න",
+  "librarySaved": "සුරක්ෂිතයි",
+  "libraryShare": "බෙදාහරින්න",
+  "libraryRelatedTopics": "සම්බන්ධිත මාතෘකා",
+  "libraryCategories": "වර්ග",
+  "libraryCategoryMentalHealth": "මානසික සෞඛ්‍යය",
+  "libraryCategoryRelationships": "සම්බන්ධතා",
+  "libraryCategorySelfCare": "තමන් ගැන සැලකිලිමත් වීම",
+  "libraryCategoryNutrition": "පෝෂණය",
+  "libraryCategoryFitness": "ව්‍යායාම",
+
+  "sleepTitle": "නින්ද සටහන්කරණය",
+  "sleepQualityPrompt": "ඔබගේ ඊයේ රාත්‍රී නින්ද කෙසේද?",
+  "sleepQuality1": "ඉතා දුර්වලයි",
+  "sleepQuality2": "දුර්වලයි",
+  "sleepQuality3": "සාමාන්‍යයි",
+  "sleepQuality4": "හොඳයි",
+  "sleepQuality5": "විශිෂ්ටයි",
+  "sleepHoursHint": "නින්ද පැය (උදා: 7.5)",
+  "sleepNoteHint": "ඔබගේ නින්ද පිළිබඳ සටහනක්?",
+  "sleepSaved": "නින්ද සුරක්ෂිත කර ඇත ✓",
+  "sleepAverage": "දින 7 සාමාන්‍යය: {hours} පැය",
+  "@sleepAverage": {
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+
+  "crisisTitle": "සහාය අවශ්‍යද?",
+  "crisisSubtitle": "ඔබ හුදෙකලා නොවේ. පුහුණු උපදේශකයින් දැන්ම ලබාගත හැකිය.",
+  "crisisCallButton": "දැන්ම අමතන්න",
+  "crisisNIMHName": "NIMH ශ්‍රී ලංකා",
+  "crisisNIMHNumber": "1926",
+  "crisisNIMHDescription": "ජාතික මානසික සෞඛ්‍ය ආයතනය — නොමිලේ, 24/7",
+  "crisisSahanayaName": "සහනය",
+  "crisisSahanayaNumber": "011-2696666",
+  "crisisSahanayaDescription": "උපදේශනය සහ මානසික සහාය",
+  "crisisBannerMild": "ඔබට වැඩි පීඩනයක් දැනෙනවාද?  ඔබ හුදෙකලා නොවේ.",
+  "crisisBannerHigh": "ඔබට ටිකක් සහාය අවශ්‍ය විය හැකිය. කරුණාකර සම්බන්ධ වන්න.",
+  "crisisBannerLink": "සහාය සම්පත් බලන්න →",
+  "crisisEncouragement": "සහාය ඉල්ලා සිටීම ශක්තියේ ලකුණකි, දුර්වලතාවයක් නොවේ.",
+  "crisisPrivacyNote": "මෙම ඇමතුම් රහස්‍යභාවයෙන් යුතුය. ඔබගේ ආරක්ෂාව සහ පුද්ගලිකත්වය වැදගත් වේ."
+}
