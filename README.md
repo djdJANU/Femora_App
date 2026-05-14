@@ -83,16 +83,13 @@ Our central AI core that:
 - **JWT** - Token-based authentication (via Supabase)
 
 ### AI/ML Service
-- **Python 3.11+** - ML algorithms
-- **FastAPI** - API framework
-- **NumPy & Pandas** - Data processing
-- **Scikit-learn** - Machine learning
+- Gemini AI API
+- OpenRouter API
 
 ### Development Tools
 - **Git & GitHub** - Version control
 - **VS Code** - Code editor
 - **Android Studio / Xcode** - Mobile development
-- **Postman / Thunder Client** - API testing
 
 ---
 
@@ -100,16 +97,22 @@ Our central AI core that:
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
+-Installation
+-The Femora application is distributed as an Android APK file. To install on an Android device running Android 8.0 (API level 26) or higher, the following steps are required:
+-Enable “Install unknown apps” in the device Settings > Security menu for the file manager or browser being used to open the APK.
+-Transfer the APK file to the device via USB, email, or cloud storage.
+-Open the APK file using the device file manager and follow the on-screen installation prompts.
+-On first launch, enter a valid email address to receive a one-time password and complete registration.
+-Minimum Platform Specification
+-	Android version: 8.0 (Oreo) or higher
+-	RAM: 2 GB minimum
+-	Storage: 100 MB free space
+-	Internet connectivity: Required for authentication, data synchronisation, and AI features
+-	GPS: Required for SOS location sharing
+-A.3 Module Usage Overview
+-The home screen provides access to all modules via navigation tiles and the bottom navigation bar. The Femi AI companion is accessible via the hero banner at the -top of the home screen and the floating Lumi button visible throughout the application. The SOS module is accessible via the SOS icon in the bottom navigation bar and is reachable within two taps from any screen.
+ 
 
-- **Flutter SDK 3.16+** ([Installation Guide](https://docs.flutter.dev/get-started/install))
-- **Dart 3.0+** (comes with Flutter)
-- **Node.js v18+** ([Download](https://nodejs.org/))
-- **npm** (comes with Node.js)
-- **Python 3.11+** (for AI service)
-- **Git** ([Download](https://git-scm.com/))
-- **Supabase Account** ([Sign up](https://supabase.com))
-- **Android Studio** (for Android) or **Xcode** (for iOS)
 
 ### Steps to Set Up
 
