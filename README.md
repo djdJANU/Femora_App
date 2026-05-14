@@ -79,8 +79,6 @@ Our central AI core that:
 - **FL Chart** - Data visualization
 
 ### Backend
-- **Node.js v18+** - Runtime environment
-- **Express.js** - Web framework
 - **Supabase** - PostgreSQL database & authentication
 - **JWT** - Token-based authentication (via Supabase)
 
