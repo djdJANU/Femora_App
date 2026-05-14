@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../config/app_theme.dart';
 import '../../config/supabase_config.dart';
 import '../../providers/theme_provider.dart';
@@ -421,6 +422,7 @@ class _PostCard extends StatefulWidget {
 class _PostCardState extends State<_PostCard> {
   late bool _liked;
   late int _likeCount;
+  late int _commentCount;
   bool _expanded = false;
   bool _toggling = false;
 
@@ -429,6 +431,7 @@ class _PostCardState extends State<_PostCard> {
     super.initState();
     _liked = false;
     _likeCount = (widget.post['likes_count'] as num?)?.toInt() ?? 0;
+    _commentCount = (widget.post['comments_count'] as num?)?.toInt() ?? 0;
     _checkLiked();
   }
 
@@ -441,18 +444,21 @@ class _PostCardState extends State<_PostCard> {
   Future<void> _toggleLike() async {
     if (_toggling) return;
     HapticFeedback.lightImpact();
+    final wasLiked = _liked;
     setState(() {
       _toggling = true;
       _liked = !_liked;
-      _likeCount += _liked ? 1 : -1;
+      _likeCount = (_likeCount + (_liked ? 1 : -1)).clamp(0, 999999);
     });
     try {
-      await widget.repo.toggleLike(widget.post['id'] as String);
+      final nowLiked =
+          await widget.repo.toggleLike(widget.post['id'] as String);
+      if (mounted) setState(() => _liked = nowLiked);
     } catch (_) {
       if (mounted) {
         setState(() {
-          _liked = !_liked;
-          _likeCount += _liked ? 1 : -1;
+          _liked = wasLiked;
+          _likeCount = (_likeCount + (wasLiked ? 1 : -1)).clamp(0, 999999);
         });
       }
     } finally {
@@ -582,18 +588,116 @@ class _PostCardState extends State<_PostCard> {
     }
   }
 
+  Future<void> _showAuthorInfo() async {
+    final post = widget.post;
+    final isAnon = post['is_anonymous'] as bool? ?? false;
+    if (isAnon) return;
+
+    final userId = post['user_id'] as String?;
+    final authorName = post['author_name'] as String? ?? 'Unknown';
+
+    int postCount = 0;
+    if (userId != null) {
+      try {
+        postCount = await widget.repo.getUserPostCount(userId);
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: widget.cardColor,
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: widget.dividerColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: FemoraColors.primary.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  authorName.isNotEmpty ? authorName[0].toUpperCase() : '?',
+                  style: FemoraTextStyles.headlineLarge.copyWith(
+                    color: FemoraColors.primary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              authorName,
+              style: FemoraTextStyles.titleLarge.copyWith(
+                color: widget.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '$postCount post${postCount == 1 ? '' : 's'} in the community',
+              style: FemoraTextStyles.bodyMedium
+                  .copyWith(color: widget.textSecondary),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _share() {
+    final post = widget.post;
+    final isAnon = post['is_anonymous'] as bool? ?? false;
+    final author = isAnon
+        ? (post['anonymous_alias'] as String? ?? 'Anonymous')
+        : (post['author_name'] as String? ?? 'Someone');
+    final content = post['content'] as String? ?? '';
+    final category = post['category'] as String?;
+
+    final text = StringBuffer();
+    text.writeln('${category != null ? "[$category] " : ""}$content');
+    text.writeln();
+    text.writeln('— Shared from Femora Community');
+
+    Share.share(text.toString(), subject: 'Post by $author on Femora');
+  }
+
   void _openComments() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _CommentsSheet(
         post: widget.post,
         isDark: widget.isDark,
         currentUserId: widget.currentUserId,
         repo: widget.repo,
+        onCommentAdded: () {
+          if (mounted) setState(() => _commentCount++);
+        },
       ),
-    ).then((_) => widget.onRefresh());
+    );
   }
 
   @override
@@ -609,13 +713,10 @@ class _PostCardState extends State<_PostCard> {
     final content = post['content'] as String? ?? '';
     final imageUrl = post['image_url'] as String?;
     final isOwn = post['user_id'] == widget.currentUserId;
-    final commentCount = (post['comments_count'] as num?)?.toInt() ?? 0;
     final lang = post['language'] as String?;
 
-    return GestureDetector(
-      onTap: _openComments,
-      child: Container(
-        decoration: BoxDecoration(
+    return Container(
+      decoration: BoxDecoration(
           color: widget.cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: widget.isDark
@@ -637,56 +738,64 @@ class _PostCardState extends State<_PostCard> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: isAnon
-                          ? (widget.isDark
-                              ? FemoraColors.darkLavender
-                              : FemoraColors.lavenderWhisper)
-                          : FemoraColors.primary.withOpacity(0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        initials,
-                        style: FemoraTextStyles.bodyMedium.copyWith(
-                          color: FemoraColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Name + meta
+                  // Avatar + name (tappable)
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          authorName,
-                          overflow: TextOverflow.ellipsis,
-                          style: FemoraTextStyles.bodyMedium.copyWith(
-                            color: widget.textPrimary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Wrap(
-                          spacing: 6,
-                          children: [
-                            Text(
-                              _timeAgo(post['created_at'] as String?),
-                              style: FemoraTextStyles.caption
-                                  .copyWith(color: widget.textSecondary),
+                    child: GestureDetector(
+                      onTap: _showAuthorInfo,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: isAnon
+                                  ? (widget.isDark
+                                      ? FemoraColors.darkLavender
+                                      : FemoraColors.lavenderWhisper)
+                                  : FemoraColors.primary.withOpacity(0.15),
+                              shape: BoxShape.circle,
                             ),
-                            if (lang != null && lang != 'en')
-                              _chip(lang.toUpperCase()),
-                            if (category != null) _chip(category),
-                          ],
-                        ),
-                      ],
+                            child: Center(
+                              child: Text(
+                                initials,
+                                style: FemoraTextStyles.bodyMedium.copyWith(
+                                  color: FemoraColors.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  authorName,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: FemoraTextStyles.bodyMedium.copyWith(
+                                    color: widget.textPrimary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Wrap(
+                                  spacing: 6,
+                                  children: [
+                                    Text(
+                                      _timeAgo(post['created_at'] as String?),
+                                      style: FemoraTextStyles.caption.copyWith(
+                                          color: widget.textSecondary),
+                                    ),
+                                    if (lang != null && lang != 'en')
+                                      _chip(lang.toUpperCase()),
+                                    if (category != null) _chip(category),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   // More menu
@@ -769,16 +878,26 @@ class _PostCardState extends State<_PostCard> {
             // ── Image ─────────────────────────────────────────────────
             if (imageUrl != null && imageUrl.isNotEmpty) ...[
               const SizedBox(height: 10),
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => _FullScreenImage(imageUrl: imageUrl),
+                  ),
                 ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
                 child: Image.network(
                   imageUrl,
                   width: double.infinity,
                   height: 220,
                   fit: BoxFit.cover,
+                  headers: const {
+                    'Cache-Control': 'no-cache',
+                  },
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;
                     return Container(
@@ -792,74 +911,98 @@ class _PostCardState extends State<_PostCard> {
                       ),
                     );
                   },
-                  errorBuilder: (_, _, _) => Container(
-                    height: 80,
-                    color: widget.isDark
-                        ? FemoraColors.darkSurfaceRaised
-                        : FemoraColors.lavenderWhisper,
-                    child: Center(
-                      child: Icon(Icons.broken_image_outlined,
-                          color: widget.textSecondary),
-                    ),
-                  ),
+                  errorBuilder: (_, error, _) {
+                    debugPrint('Image load error: $error');
+                    return Container(
+                      height: 80,
+                      color: widget.isDark
+                          ? FemoraColors.darkSurfaceRaised
+                          : FemoraColors.lavenderWhisper,
+                      child: Center(
+                        child: Icon(Icons.broken_image_outlined,
+                            color: widget.textSecondary),
+                      ),
+                    );
+                  },
                 ),
               ),
+            ),
             ] else
               const SizedBox(height: 10),
 
             // ── Actions ───────────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
               child: Row(children: [
+                // Like button
                 GestureDetector(
                   onTap: _toggleLike,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    child: Row(
-                      key: ValueKey(_liked),
-                      children: [
-                        Icon(
-                          _liked
-                              ? Icons.favorite_rounded
-                              : Icons.favorite_outline_rounded,
-                          size: 20,
-                          color: _liked
-                              ? FemoraColors.error
-                              : widget.textSecondary,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(children: [
+                      Icon(
+                        _liked
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_outline_rounded,
+                        size: 26,
+                        color: _liked
+                            ? FemoraColors.error
+                            : widget.textSecondary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$_likeCount',
+                        style: FemoraTextStyles.bodyMedium.copyWith(
+                          color: widget.textSecondary,
+                          fontWeight: FontWeight.w600,
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$_likeCount',
-                          style: FemoraTextStyles.caption.copyWith(
-                            color: widget.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ]),
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 4),
+                // Comment button
                 GestureDetector(
                   onTap: _openComments,
-                  child: Row(children: [
-                    Icon(Icons.chat_bubble_outline_rounded,
-                        size: 20, color: widget.textSecondary),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$commentCount',
-                      style: FemoraTextStyles.caption.copyWith(
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(children: [
+                      Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        size: 26,
                         color: widget.textSecondary,
-                        fontWeight: FontWeight.w600,
                       ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$_commentCount',
+                        style: FemoraTextStyles.bodyMedium.copyWith(
+                          color: widget.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+                const Spacer(),
+                // Share button — inline, right side
+                GestureDetector(
+                  onTap: _share,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.share_outlined,
+                      size: 24,
+                      color: widget.textSecondary,
                     ),
-                  ]),
+                  ),
                 ),
               ]),
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -890,12 +1033,14 @@ class _CommentsSheet extends StatefulWidget {
     required this.isDark,
     required this.currentUserId,
     required this.repo,
+    required this.onCommentAdded,
   });
 
   final Map<String, dynamic> post;
   final bool isDark;
   final String? currentUserId;
   final CommunityRepository repo;
+  final VoidCallback onCommentAdded;
 
   @override
   State<_CommentsSheet> createState() => _CommentsSheetState();
@@ -959,6 +1104,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
       );
       _ctrl.clear();
       _focusNode.unfocus();
+      widget.onCommentAdded();
       await _load();
     } catch (e) {
       if (mounted) {
@@ -974,206 +1120,220 @@ class _CommentsSheetState extends State<_CommentsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      minChildSize: 0.4,
-      maxChildSize: 0.93,
-      builder: (_, scrollCtrl) => Container(
-        decoration: BoxDecoration(
-          color: _bg,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(children: [
-          // Handle
-          Center(
+    return LayoutBuilder(
+      builder: (context, _) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.75,
+          minChildSize: 0.4,
+          maxChildSize: 0.93,
+          builder: (_, scrollCtrl) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
             child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              width: 40,
-              height: 4,
               decoration: BoxDecoration(
-                color: _divider,
-                borderRadius: BorderRadius.circular(2),
+                color: _bg,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Comments',
-                style: FemoraTextStyles.titleLarge.copyWith(
-                    color: _textPrimary, fontWeight: FontWeight.w800),
-              ),
-            ),
-          ),
-          Divider(color: _divider, height: 1),
-          // List
-          Expanded(
-            child: _loading
-                ? const Center(
-                    child: CircularProgressIndicator(
-                        color: FemoraColors.primary))
-                : _comments.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No comments yet. Be the first!',
-                          style: FemoraTextStyles.bodyMedium
-                              .copyWith(color: _textSecondary),
-                        ),
-                      )
-                    : ListView.separated(
-                        controller: scrollCtrl,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        itemCount: _comments.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: 12),
-                        itemBuilder: (_, i) {
-                          final c = _comments[i];
-                          final isAnon =
-                              c['is_anonymous'] as bool? ?? false;
-                          final name = isAnon
-                              ? 'Anonymous'
-                              : (c['author_name'] as String? ?? 'Unknown');
-                          final initials = isAnon
-                              ? '?'
-                              : (name.isNotEmpty
-                                  ? name[0].toUpperCase()
-                                  : '?');
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 32,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                  color: FemoraColors.primary
-                                      .withOpacity(0.12),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: Text(initials,
-                                      style: FemoraTextStyles.caption
-                                          .copyWith(
-                                        color: FemoraColors.primary,
-                                        fontWeight: FontWeight.w700,
-                                      )),
-                                ),
+              child: Column(children: [
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: _divider,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Comments',
+                        style: FemoraTextStyles.titleLarge.copyWith(
+                          color: _textPrimary,
+                          fontWeight: FontWeight.w800,
+                        )),
+                  ),
+                ),
+                Divider(color: _divider, height: 1),
+                Expanded(
+                  child: _loading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                              color: FemoraColors.primary))
+                      : _comments.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No comments yet. Be the first!',
+                                style: FemoraTextStyles.bodyMedium
+                                    .copyWith(color: _textSecondary),
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
+                            )
+                          : ListView.separated(
+                              controller: scrollCtrl,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              itemCount: _comments.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (_, i) {
+                                final c = _comments[i];
+                                final isAnon =
+                                    c['is_anonymous'] as bool? ?? false;
+                                final name = isAnon
+                                    ? 'Anonymous'
+                                    : (c['author_name'] as String? ??
+                                        'Unknown');
+                                final initials = isAnon
+                                    ? '?'
+                                    : (name.isNotEmpty
+                                        ? name[0].toUpperCase()
+                                        : '?');
+                                return Row(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.start,
                                   children: [
-                                    Row(children: [
-                                      Text(name,
-                                          style: FemoraTextStyles.caption
-                                              .copyWith(
-                                            color: _textPrimary,
-                                            fontWeight: FontWeight.w700,
-                                          )),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        _timeAgo(
-                                            c['created_at'] as String?),
-                                        style: FemoraTextStyles.caption
-                                            .copyWith(
-                                                color: _textSecondary),
+                                    Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: FemoraColors.primary
+                                            .withOpacity(0.12),
+                                        shape: BoxShape.circle,
                                       ),
-                                    ]),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      c['content'] as String? ?? '',
-                                      style: FemoraTextStyles.bodyMedium
-                                          .copyWith(color: _textPrimary),
+                                      child: Center(
+                                        child: Text(initials,
+                                            style: FemoraTextStyles.caption
+                                                .copyWith(
+                                              color: FemoraColors.primary,
+                                              fontWeight: FontWeight.w700,
+                                            )),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(children: [
+                                            Text(name,
+                                                style: FemoraTextStyles
+                                                    .caption
+                                                    .copyWith(
+                                                  color: _textPrimary,
+                                                  fontWeight:
+                                                      FontWeight.w700,
+                                                )),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              _timeAgo(c['created_at']
+                                                  as String?),
+                                              style: FemoraTextStyles
+                                                  .caption
+                                                  .copyWith(
+                                                      color: _textSecondary),
+                                            ),
+                                          ]),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            c['content'] as String? ?? '',
+                                            style: FemoraTextStyles
+                                                .bodyMedium
+                                                .copyWith(
+                                                    color: _textPrimary),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
-                                ),
+                                );
+                              },
+                            ),
+                ),
+                // Input area — always visible above keyboard
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  decoration: BoxDecoration(
+                    color: _bg,
+                    border: Border(top: BorderSide(color: _divider)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(children: [
+                        Text('Post anonymously',
+                            style: FemoraTextStyles.caption
+                                .copyWith(color: _textSecondary)),
+                        const Spacer(),
+                        Switch(
+                          value: _isAnon,
+                          onChanged: (v) => setState(() => _isAnon = v),
+                          activeColor: FemoraColors.primary,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ]),
+                      const SizedBox(height: 4),
+                      Row(children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _ctrl,
+                            focusNode: _focusNode,
+                            textCapitalization:
+                                TextCapitalization.sentences,
+                            style: FemoraTextStyles.bodyMedium
+                                .copyWith(color: _textPrimary),
+                            decoration: InputDecoration(
+                              hintText: 'Write a comment...',
+                              hintStyle: FemoraTextStyles.bodyMedium
+                                  .copyWith(color: _textSecondary),
+                              filled: true,
+                              fillColor: _inputBg,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide.none,
                               ),
-                            ],
-                          );
-                        },
-                      ),
-          ),
-          // Input
-          SafeArea(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-              decoration: BoxDecoration(
-                color: _bg,
-                border: Border(top: BorderSide(color: _divider)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(children: [
-                    Text('Post anonymously',
-                        style: FemoraTextStyles.caption
-                            .copyWith(color: _textSecondary)),
-                    const Spacer(),
-                    Switch(
-                      value: _isAnon,
-                      onChanged: (v) => setState(() => _isAnon = v),
-                      activeColor: FemoraColors.primary,
-                      materialTapTargetSize:
-                          MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ]),
-                  const SizedBox(height: 4),
-                  Row(children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _ctrl,
-                        focusNode: _focusNode,
-                        textCapitalization: TextCapitalization.sentences,
-                        style: FemoraTextStyles.bodyMedium
-                            .copyWith(color: _textPrimary),
-                        decoration: InputDecoration(
-                          hintText: 'Write a comment...',
-                          hintStyle: FemoraTextStyles.bodyMedium
-                              .copyWith(color: _textSecondary),
-                          filled: true,
-                          fillColor: _inputBg,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: _send,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: FemoraColors.primary,
-                          shape: BoxShape.circle,
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: _send,
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: const BoxDecoration(
+                              color: FemoraColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: _sending
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2))
+                                : const Icon(Icons.send_rounded,
+                                    color: Colors.white, size: 20),
+                          ),
                         ),
-                        child: _sending
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                    color: Colors.white, strokeWidth: 2),
-                              )
-                            : const Icon(Icons.send_rounded,
-                                color: Colors.white, size: 18),
-                      ),
-                    ),
-                  ]),
-                ],
-              ),
+                      ]),
+                    ],
+                  ),
+                ),
+              ]),
             ),
           ),
-        ]),
-      ),
+        );
+      },
     );
   }
 }
@@ -1208,6 +1368,13 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
   String? _selectedCategory;
   File? _pickedImage;
   String? _uploadedImageUrl;
+  String _selectedLang = 'en';
+
+  static const _postLangs = [
+    _LangFilter(code: 'en', label: 'English'),
+    _LangFilter(code: 'si', label: 'සිංහල'),
+    _LangFilter(code: 'ta', label: 'தமிழ்'),
+  ];
 
   static const _categories = [
     'Mental Health',
@@ -1281,6 +1448,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
         isAnonymous: _isAnon,
         category: _selectedCategory,
         imageUrl: _uploadedImageUrl,
+        language: _selectedLang,
       );
       if (mounted) {
         Navigator.pop(context);
@@ -1457,6 +1625,39 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
                   ),
                 ),
               const SizedBox(height: 16),
+              // Language selector
+              Text('Post language',
+                  style: FemoraTextStyles.bodyMedium.copyWith(
+                      color: _textPrimary, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              Row(
+                children: _postLangs.map((lang) {
+                  final selected = _selectedLang == lang.code;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedLang = lang.code),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: selected ? FemoraColors.primary : _inputBg,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(lang.label,
+                            style: FemoraTextStyles.caption.copyWith(
+                              color: selected ? Colors.white : _textSecondary,
+                              fontWeight: selected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                            )),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
               // Category chips
               Text('Category',
                   style: FemoraTextStyles.bodyMedium.copyWith(
@@ -1569,6 +1770,70 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Full Screen Image Viewer ──────────────────────────────────────────────────
+
+class _FullScreenImage extends StatelessWidget {
+  final String imageUrl;
+  const _FullScreenImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Center(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                loadingBuilder: (_, child, progress) {
+                  if (progress == null) return child;
+                  return const Center(
+                    child: CircularProgressIndicator(
+                        color: FemoraColors.primary),
+                  );
+                },
+                errorBuilder: (_, _, _) => const Icon(
+                  Icons.broken_image_outlined,
+                  color: Colors.white54,
+                  size: 64,
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -197,7 +197,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get musicTitle => 'அமைதி இசை';
 
   @override
-  String get musicSubtitle => '[NEEDS TRANSLATION]';
+  String get musicSubtitle => 'இசையுடன் ஓய்வெடுங்கள்';
 
   @override
   String get musicCategorySleep => 'தூக்கம்';
@@ -230,25 +230,25 @@ class AppLocalizationsTa extends AppLocalizations {
   String get libraryShare => 'பகிரவும்';
 
   @override
-  String get libraryRelatedTopics => '[NEEDS TRANSLATION]';
+  String get libraryRelatedTopics => 'தொடர்புடைய தலைப்புகள்';
 
   @override
-  String get libraryCategories => '[NEEDS TRANSLATION]';
+  String get libraryCategories => 'வகைகள்';
 
   @override
   String get libraryCategoryMentalHealth => 'மன ஆரோக்கியம்';
 
   @override
-  String get libraryCategoryRelationships => '[NEEDS TRANSLATION]';
+  String get libraryCategoryRelationships => 'உறவுகள்';
 
   @override
-  String get libraryCategorySelfCare => '[NEEDS TRANSLATION]';
+  String get libraryCategorySelfCare => 'சுய பராமரிப்பு';
 
   @override
-  String get libraryCategoryNutrition => '[NEEDS TRANSLATION]';
+  String get libraryCategoryNutrition => 'ஊட்டச்சத்து';
 
   @override
-  String get libraryCategoryFitness => '[NEEDS TRANSLATION]';
+  String get libraryCategoryFitness => 'உடற்தகுதி';
 
   @override
   String get sleepTitle => 'தூக்க கண்காணிப்பு';
@@ -272,10 +272,10 @@ class AppLocalizationsTa extends AppLocalizations {
   String get sleepQuality5 => 'சிறப்பு';
 
   @override
-  String get sleepHoursHint => '[NEEDS TRANSLATION]';
+  String get sleepHoursHint => 'எத்தனை மணி நேரம்?';
 
   @override
-  String get sleepNoteHint => '[NEEDS TRANSLATION]';
+  String get sleepNoteHint => 'குறிப்பு சேர்க்கவும்';
 
   @override
   String get sleepSaved => 'தூக்க பதிவு சேமிக்கப்பட்டது ✓';

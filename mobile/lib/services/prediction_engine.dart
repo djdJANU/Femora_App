@@ -16,9 +16,15 @@ class PredictionEngine {
         return 28; // Default cycle length
       }
 
-      // Filter only confirmed cycles with cycle length
+      // Filter only confirmed cycles with cycle length in the normal range
+      // (21–35 days). Cycles outside this range are treated as irregular
+      // and excluded from the average.
       final validCycles = cycles
-          .where((c) => c.isConfirmed && c.cycleLength != null)
+          .where((c) =>
+              c.isConfirmed &&
+              c.cycleLength != null &&
+              c.cycleLength! >= 21 &&
+              c.cycleLength! <= 35)
           .toList();
 
       if (validCycles.isEmpty) {
@@ -56,10 +62,28 @@ class PredictionEngine {
         return null; // No data yet
       }
 
-      // Get the most recent cycle
-      final lastCycle = cycles.first;
+      // Only use confirmed cycles with cycle_length in the normal
+      // range (21–35 days). Anything outside that is treated as
+      // unusable data — we will not project a date from it.
+      final validCycles = cycles
+          .where((c) =>
+              c.isConfirmed &&
+              c.cycleLength != null &&
+              c.cycleLength! >= 21 &&
+              c.cycleLength! <= 35)
+          .toList();
 
-      // Calculate average cycle length
+      if (validCycles.isEmpty) {
+        // No reliable cycle to anchor a prediction on — show empty
+        // state in the UI rather than a misleading 28-day default.
+        return null;
+      }
+
+      // Get the most recent valid cycle as the anchor
+      final lastCycle = validCycles.first;
+
+      // Calculate average cycle length (falls back to 28 only when no
+      // valid cycles exist — which we have already excluded above)
       final avgCycleLength = await calculateWeightedAverageCycleLength();
 
       // Calculate next period date
@@ -102,7 +126,11 @@ class PredictionEngine {
       final cycles = await _repository.fetchUserCycles(limit: 6);
 
       final validCycles = cycles
-          .where((c) => c.isConfirmed && c.cycleLength != null)
+          .where((c) =>
+              c.isConfirmed &&
+              c.cycleLength != null &&
+              c.cycleLength! >= 21 &&
+              c.cycleLength! <= 35)
           .toList();
 
       if (validCycles.length < 3) {

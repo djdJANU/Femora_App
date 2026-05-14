@@ -1,5 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import '../../config/app_theme.dart';
+import '../femi/femi_screen.dart';
 import '../reproductive/reproductive_health_screen.dart';
 import 'widgets/greeting_header.dart';
 import 'widgets/period_tracker_card.dart';
@@ -145,7 +148,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 onAvatarTap: _onAvatarTap,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+
+              // ── Femi (Lumi) greeting card ────────────────────────────
+              _buildLumiGreetingCard(),
+
+              const SizedBox(height: 24),
 
               // ── Period Tracker Section ───────────────────────────────
               _buildSectionHeader(
@@ -157,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               PeriodTrackerCard(
                 onGetStarted: _onPeriodTrackerTap,
-                imageAsset: 'assets/images/home/Period girl.png',
+                imageAsset: 'assets/images/lumi/lumi_period.png',
               ),
 
               const SizedBox(height: 32),
@@ -190,12 +198,96 @@ class _HomeScreenState extends State<HomeScreen> {
               PregnancySection(
                 onGetStarted: _onGetStartedPregnancy,
                 onViewMore: _onViewMorePregnancy,
-                imageAsset: 'assets/images/home/pregnancypic_home.png',
+                imageAsset: 'assets/images/lumi/lumi_pregnancy.png',
               ),
 
               const SizedBox(height: 24),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds the tappable Femi/Lumi greeting card
+  Widget _buildLumiGreetingCard() {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const FemiScreen()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF9B59F5), Color(0xFFA66CFF)],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFA66CFF).withOpacity(0.35),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8, bottom: 8),
+              child: Image.asset(
+                'assets/images/lumi/lumi_wave.png',
+                width: 90,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) =>
+                    const Text('💜', style: TextStyle(fontSize: 50)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Talk to Femi 💜',
+                    style: FemoraTextStyles.titleLarge.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Your AI wellness companion — ask me anything about your health, mood, or cycle.',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: FemoraTextStyles.caption.copyWith(
+                      color: Colors.white.withOpacity(0.88),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Chat now →',
+                      style: FemoraTextStyles.caption.copyWith(
+                        color: FemoraColors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
