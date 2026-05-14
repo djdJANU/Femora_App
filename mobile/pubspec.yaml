@@ -52,6 +52,8 @@ dependencies:
   geolocator: ^13.0.4
   sensors_plus: ^6.1.0
   image_picker: ^1.1.2
+  google_generative_ai: ^0.4.6
+  http: ^1.2.0
 
 
 dev_dependencies:
@@ -85,6 +87,7 @@ flutter:
     - assets/images/home/
     - assets/images/mood/
     - assets/images/pregnancy/
+    - assets/images/lumi/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

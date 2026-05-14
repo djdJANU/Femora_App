@@ -61,8 +61,10 @@ class CommunityRepository {
           .from('community-images')
           .getPublicUrl(fileName);
 
-      debugPrint('Uploaded image URL: $url');
-      return url;
+      // Strip query params that can cause display issues
+      final cleanUrl = url.contains('?') ? url.split('?')[0] : url;
+      debugPrint('Uploaded image URL: $cleanUrl');
+      return cleanUrl;
     } catch (e) {
       debugPrint('uploadImage ERROR: $e');
       return null;
@@ -190,25 +192,18 @@ class CommunityRepository {
             .delete()
             .eq('post_id', postId)
             .eq('user_id', userId);
+        await _supabase.rpc('decrement_likes',
+            params: {'post_id': postId});
+        return false;
       } else {
         await _supabase.from('post_likes').insert({
           'post_id': postId,
           'user_id': userId,
         });
+        await _supabase.rpc('increment_likes',
+            params: {'post_id': postId});
+        return true;
       }
-
-      final countResult = await _supabase
-          .from('post_likes')
-          .select('id')
-          .eq('post_id', postId);
-      final actualCount = (countResult as List).length;
-
-      await _supabase
-          .from('community_posts')
-          .update({'likes_count': actualCount})
-          .eq('id', postId);
-
-      return existing == null;
     } catch (e) {
       debugPrint('CommunityRepository.toggleLike error: $e');
       rethrow;
@@ -289,10 +284,8 @@ class CommunityRepository {
         'content': content.trim(),
         'is_anonymous': isAnonymous,
       });
-      try {
-        await _supabase
-            .rpc('increment_comments', params: {'post_id': postId});
-      } catch (_) {}
+      await _supabase.rpc('increment_comments',
+          params: {'post_id': postId});
     } catch (e) {
       debugPrint('CommunityRepository.addComment error: $e');
       rethrow;
@@ -319,6 +312,21 @@ class CommunityRepository {
     }
   }
 
+  // ── User stats ───────────────────────────────────────────────────────────
+
+  Future<int> getUserPostCount(String userId) async {
+    try {
+      final result = await _supabase
+          .from('community_posts')
+          .select('id')
+          .eq('user_id', userId);
+      return (result as List).length;
+    } catch (e) {
+      debugPrint('getUserPostCount error: $e');
+      return 0;
+    }
+  }
+
   // ── My posts ──────────────────────────────────────────────────────────────
 
   Future<List<Map<String, dynamic>>> getMyPosts() async {
@@ -330,11 +338,21 @@ class CommunityRepository {
           .select(
             'id, content, image_url, is_anonymous, anonymous_alias, '
             'likes_count, comments_count, created_at, user_id, '
-            'category, language',
+            'category, language, profiles(full_name)',
           )
           .eq('user_id', userId)
           .order('created_at', ascending: false);
-      return List<Map<String, dynamic>>.from(response);
+
+      return List<Map<String, dynamic>>.from(response).map((post) {
+        final isAnon = post['is_anonymous'] as bool? ?? false;
+        final profileName =
+            (post['profiles'] as Map<String, dynamic>?)?['full_name']
+                as String?;
+        return {
+          ...post,
+          'author_name': isAnon ? null : profileName,
+        };
+      }).toList();
     } catch (e) {
       debugPrint('CommunityRepository.getMyPosts error: $e');
       return [];

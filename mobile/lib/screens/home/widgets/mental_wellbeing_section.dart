@@ -69,6 +69,15 @@ class _MentalWellbeingSectionState extends State<MentalWellbeingSection> {
       ),
       child: Column(
         children: [
+          Center(
+            child: Image.asset(
+              'assets/images/lumi/lumi_wellbeing.png',
+              height: 80,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => const SizedBox(height: 80),
+            ),
+          ),
+          const SizedBox(height: 8),
           Text(
             'Choose your mood',
             style: FemoraTextStyles.titleLarge.copyWith(

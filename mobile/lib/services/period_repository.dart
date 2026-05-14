@@ -291,7 +291,7 @@ class PeriodRepository {
           .from('period_cycles')
           .select()
           .eq('user_id', userId)
-          .filter('end_date', 'is', null)
+          .isFilter('end_date', null)
           .order('start_date', ascending: false)
           .limit(1)
           .maybeSingle();

@@ -138,10 +138,16 @@ class PhaseCalculator {
   ///
   /// OLD BUG: Used DateTime.now() here instead of selectedDate.
   /// FIXED: All comparisons now use [selectedDate] explicitly.
-  PhaseInfo _estimatePhaseFromPrediction(
+  PhaseInfo? _estimatePhaseFromPrediction(
     CyclePrediction prediction,
     DateTime selectedDate,
   ) {
+    // Predicted next period is already in the past — the prediction is
+    // stale, so refuse to estimate a phase from it.
+    if (prediction.nextPeriodDate.isBefore(DateTime.now())) {
+      return null;
+    }
+
     final daysUntilPeriod = prediction.nextPeriodDate
         .difference(selectedDate)
         .inDays;

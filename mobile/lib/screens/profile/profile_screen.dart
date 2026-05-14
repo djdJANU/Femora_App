@@ -881,9 +881,9 @@ class _SavedScreenState extends State<_SavedScreen>
   final _supabase = SupabaseConfig.client;
   late TabController _tabCtrl;
 
-  List<Map<String, dynamic>> _savedArticles = [];
+  List<Map<String, dynamic>> _articles = [];
   List<Map<String, dynamic>> _savedPosts = [];
-  bool _isLoading = true;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -899,34 +899,50 @@ class _SavedScreenState extends State<_SavedScreen>
   }
 
   Future<void> _load() async {
-    final userId = _supabase.auth.currentUser?.id;
-    if (userId == null) return;
+    setState(() => _loading = true);
     try {
-      // Step 1: get saved article IDs
-      final savedRows = await _supabase
-          .from('mental_saved_articles')
-          .select('article_id')
-          .eq('user_id', userId);
-
-      final articleIds = (savedRows as List)
-          .map((r) => r['article_id'].toString())
-          .where((id) => id.isNotEmpty)
-          .toList();
-
-      debugPrint('Saved article IDs: $articleIds');
-
-      // Step 2: fetch matching articles
-      List<Map<String, dynamic>> articles = [];
-      if (articleIds.isNotEmpty) {
-        final articleRows = await _supabase
-            .from('library_articles')
-            .select()
-            .inFilter('id', articleIds);
-        articles = List<Map<String, dynamic>>.from(articleRows);
-        debugPrint('Fetched articles: ${articles.length}');
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) {
+        setState(() => _loading = false);
+        return;
       }
 
-      // Step 3: fetch liked posts
+      // Fetch saved articles with full article data joined
+      final response = await _supabase
+          .from('mental_saved_articles')
+          .select('''
+            id,
+            saved_at,
+            article_id,
+            library_articles (
+              id,
+              title,
+              category,
+              content,
+              read_time_minutes,
+              is_published
+            )
+          ''')
+          .eq('user_id', userId)
+          .order('saved_at', ascending: false);
+
+      final List<Map<String, dynamic>> articles = [];
+      for (final row in response as List) {
+        final article = row['library_articles'];
+        if (article == null) continue;
+        if (article['is_published'] == false) continue;
+        articles.add({
+          'id': article['id'],
+          'title': article['title'] ?? 'Untitled',
+          'category': article['category'] ?? 'general',
+          'content': article['content'] ?? '',
+          'read_time_minutes': article['read_time_minutes'] ?? 5,
+          'saved_at': row['saved_at'],
+          'article_id': row['article_id'],
+        });
+      }
+
+      // Fetch liked posts
       final posts = await _supabase
           .from('post_likes')
           .select('post_id, community_posts(id, content, is_anonymous, created_at)')
@@ -935,14 +951,14 @@ class _SavedScreenState extends State<_SavedScreen>
 
       if (mounted) {
         setState(() {
-          _savedArticles = articles;
+          _articles = articles;
           _savedPosts = List<Map<String, dynamic>>.from(posts);
-          _isLoading = false;
+          _loading = false;
         });
       }
     } catch (e) {
-      debugPrint('Saved load error: $e');
-      if (mounted) setState(() => _isLoading = false);
+      debugPrint('_SavedScreen._load error: $e');
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -1007,7 +1023,7 @@ class _SavedScreenState extends State<_SavedScreen>
           ),
           // Content
           Expanded(
-            child: _isLoading
+            child: _loading
                 ? const Center(
                     child: CircularProgressIndicator(
                         color: FemoraColors.primary))
@@ -1025,16 +1041,22 @@ class _SavedScreenState extends State<_SavedScreen>
   }
 
   Widget _buildArticlesList() {
-    if (_savedArticles.isEmpty) {
+    if (_articles.isEmpty) {
       return _empty('No saved articles yet',
           'Articles you save in the Library will appear here.');
     }
     return ListView.separated(
       padding: const EdgeInsets.all(16),
-      itemCount: _savedArticles.length,
+      itemCount: _articles.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, i) {
-        final article = _savedArticles[i];
+        final article = _articles[i];
+        final title = article['title'] as String? ?? 'Untitled';
+        final category = article['category'] as String? ?? '';
+        final readTime = article['read_time_minutes'] as int? ?? 5;
+        final subtitle = category.isNotEmpty
+            ? '$category • $readTime min read'
+            : '$readTime min read';
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -1051,16 +1073,15 @@ class _SavedScreenState extends State<_SavedScreen>
                 color: FemoraColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Center(
-                child: Text(article['emoji'] as String? ?? '📄',
-                    style: const TextStyle(fontSize: 18)),
+              child: const Center(
+                child: Text('📄', style: TextStyle(fontSize: 18)),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(article['title'] as String,
+                Text(title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: FemoraTextStyles.bodyMedium.copyWith(
@@ -1068,7 +1089,7 @@ class _SavedScreenState extends State<_SavedScreen>
                       fontWeight: FontWeight.w700,
                     )),
                 const SizedBox(height: 2),
-                Text('${article['read_time']} read',
+                Text(subtitle,
                     style: FemoraTextStyles.caption
                         .copyWith(color: _textSecondary)),
               ],
