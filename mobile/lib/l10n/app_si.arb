@@ -130,5 +130,19 @@
   "crisisBannerHigh": "ඔබට ටිකක් සහාය අවශ්‍ය විය හැකිය. කරුණාකර සම්බන්ධ වන්න.",
   "crisisBannerLink": "සහාය සම්පත් බලන්න →",
   "crisisEncouragement": "සහාය ඉල්ලා සිටීම ශක්තියේ ලකුණකි, දුර්වලතාවයක් නොවේ.",
-  "crisisPrivacyNote": "මෙම ඇමතුම් රහස්‍යභාවයෙන් යුතුය. ඔබගේ ආරක්ෂාව සහ පුද්ගලිකත්වය වැදගත් වේ."
+  "crisisPrivacyNote": "මෙම ඇමතුම් රහස්‍යභාවයෙන් යුතුය. ඔබගේ ආරක්ෂාව සහ පුද්ගලිකත්වය වැදගත් වේ.",
+
+  "homeGreeting": "ආයුබෝ, {name}",
+  "@homeGreeting": { "placeholders": { "name": { "type": "String" } } },
+  "homeWelcome": "Femora වෙත සාදරයෙන් පිළිගනිමු",
+  "homeFemiTitle": "Femi සමඟ කතා කරන්න 💜",
+  "homeFemiSubtitle": "ඔබගේ AI සෞඛ්‍ය සහකාරිය — ඔබගේ සෞඛ්‍යය, මනෝභාවය හෝ ඔසප් චක්‍රය ගැන ඕනෑම දෙයක් අසන්න.",
+  "homeFemiButton": "දැන් කතා කරන්න →",
+  "homeSectionPeriod": "ඔසප් සොයාගැනීම",
+  "homeSectionPregnancy": "ගර්භනී භාවය",
+  "homeViewMore": "තව බලන්න",
+  "homePeriodDescription": "ඔබගේ ඔසප් චක්‍රය සොයාගෙන පෞද්ගලිකරණ ලද ඉඟි ලබාගන්න",
+  "homeGetStarted": "ආරම්භ කරන්න",
+  "homeChooseMood": "ඔබගේ මනෝභාවය තෝරන්න",
+  "homePregnancyDescription": "Femora සමඟ ඔබගේ ගර්භනී කාලය සොයාගන්න"
 }

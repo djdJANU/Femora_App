@@ -1,7 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../config/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../femi/femi_screen.dart';
 import '../reproductive/reproductive_health_screen.dart';
 import 'widgets/greeting_header.dart';
@@ -33,23 +35,36 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-
-  // Pages for bottom navigation
-  late final List<Widget> _pages;
+  String? _avatarUrl;
 
   @override
   void initState() {
     super.initState();
-    _pages = [
-      _buildHomePage(),
-      const CommunityScreen(),
-      const WellbeingScreen(),
-      const SosScreen(),
-      const ProfileScreen(),
-    ];
+    _loadAvatarUrl();
+  }
+
+  Future<void> _loadAvatarUrl() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) return;
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', userId)
+          .maybeSingle();
+      final url = response?['avatar_url'] as String?;
+      if (mounted) {
+        setState(() {
+          _avatarUrl = url;
+        });
+      }
+    } catch (_) {}
   }
 
   void _onNavTap(int index) {
+    if (index == 0 && _currentIndex != 0) {
+      _loadAvatarUrl();
+    }
     setState(() {
       _currentIndex = index;
     });
@@ -122,7 +137,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FemoraColors.lightBackgroundTint,
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          _buildHomePage(),
+          const CommunityScreen(),
+          const WellbeingScreen(),
+          const SosScreen(),
+          const ProfileScreen(),
+        ],
+      ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onNavTap,
@@ -144,11 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
               // ── Greeting Header ──────────────────────────────────────
               GreetingHeader(
                 userName: widget.userName ?? 'Dilakna',
-                avatarImagePath: 'assets/images/home/Avatar.png',
+                avatarUrl: _avatarUrl,
                 onAvatarTap: _onAvatarTap,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 32),
 
               // ── Femi (Lumi) greeting card ────────────────────────────
               _buildLumiGreetingCard(),
@@ -157,7 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // ── Period Tracker Section ───────────────────────────────
               _buildSectionHeader(
-                title: 'Period Tracker',
+                title: AppLocalizations.of(context)?.homeSectionPeriod ??
+                    'Period Tracker',
                 onViewMore: _onViewMorePeriodTracker,
               ),
 
@@ -172,7 +197,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // ── Mental Wellbeing Section ─────────────────────────────
               _buildSectionHeader(
-                title: 'Mental Wellbeing',
+                title: AppLocalizations.of(context)?.wellbeingTabTitle ??
+                    'Mental Wellbeing',
                 onViewMore: _onViewMoreWellbeing,
               ),
 
@@ -189,7 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // ── Pregnancy Section ───────────────────────────────────
               _buildSectionHeader(
-                title: 'Pregnancy',
+                title: AppLocalizations.of(context)?.homeSectionPregnancy ??
+                    'Pregnancy',
                 onViewMore: _onViewMorePregnancy,
               ),
 
@@ -216,79 +243,85 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(builder: (_) => const FemiScreen()),
       ),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF9B59F5), Color(0xFFA66CFF)],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFFA66CFF).withOpacity(0.35),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8, bottom: 8),
-              child: Image.asset(
-                'assets/images/lumi/lumi_wave.png',
-                width: 90,
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) =>
-                    const Text('💜', style: TextStyle(fontSize: 50)),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Card background — left padding reserves space for Lumi
+          Container(
+            padding: const EdgeInsets.fromLTRB(124, 16, 16, 16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF9B59F5), Color(0xFFA66CFF)],
               ),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFA66CFF).withOpacity(0.35),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Talk to Femi 💜',
-                    style: FemoraTextStyles.titleLarge.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)?.homeFemiTitle ??
+                      'Talk to Femi 💜',
+                  style: FemoraTextStyles.titleLarge.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Your AI wellness companion — ask me anything about your health, mood, or cycle.',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  AppLocalizations.of(context)?.homeFemiSubtitle ??
+                      'Your AI wellness companion — ask me anything about your health, mood, or cycle.',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: FemoraTextStyles.caption.copyWith(
+                    color: Colors.white.withOpacity(0.88),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)?.homeFemiButton ??
+                        'Chat now →',
                     style: FemoraTextStyles.caption.copyWith(
-                      color: Colors.white.withOpacity(0.88),
-                      height: 1.4,
+                      color: FemoraColors.primary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Chat now →',
-                      style: FemoraTextStyles.caption.copyWith(
-                        color: FemoraColors.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // Lumi overflows 20px above the card top, 10px gap at bottom
+          Positioned(
+            left: 4,
+            top: -20,
+            bottom: 10,
+            width: 132,
+            child: Image.asset(
+              'assets/images/lumi/lumi_wave.png',
+              fit: BoxFit.contain,
+              alignment: Alignment.bottomCenter,
+              errorBuilder: (_, _, _) =>
+                  const Text('💜', style: TextStyle(fontSize: 50)),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -312,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
         GestureDetector(
           onTap: onViewMore,
           child: Text(
-            'view more',
+            AppLocalizations.of(context)?.homeViewMore ?? 'view more',
             style: FemoraTextStyles.bodyMedium.copyWith(
               color: FemoraColors.primary,
               fontWeight: FontWeight.w600,

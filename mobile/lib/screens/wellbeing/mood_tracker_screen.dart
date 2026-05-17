@@ -9,6 +9,7 @@ import '../../services/mental_repository.dart';
 /// ────────────────────
 /// Six mood options with emoji. Optional note.
 /// Saves to mental_mood_logs table.
+/// Shows a 7-day pattern graph + Lumi hug for sad/anxious selections.
 class MoodTrackerScreen extends StatefulWidget {
   const MoodTrackerScreen({super.key});
 
@@ -25,11 +26,11 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
   bool _isSaving = false;
   bool _savedSuccessfully = false;
   Map<String, dynamic>? _todayLog;
+  List<Map<String, dynamic>> _moodLogs = [];
 
   late AnimationController _ctrl;
   late Animation<double> _fadeAnim;
 
-  // Mood options — emoji, key, label getter
   static const _moods = [
     _MoodOption(key: 'happy',   emoji: '😊', color: Color(0xFFFBBF24)),
     _MoodOption(key: 'calm',    emoji: '😌', color: Color(0xFF34D399)),
@@ -39,15 +40,50 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
     _MoodOption(key: 'tired',   emoji: '😴', color: Color(0xFF8B5CF6)),
   ];
 
+  static int _moodScore(String mood) {
+    switch (mood) {
+      case 'happy':   return 5;
+      case 'calm':    return 4;
+      case 'tired':   return 3;
+      case 'anxious': return 3;
+      case 'sad':     return 2;
+      case 'angry':   return 1;
+      default:        return 0;
+    }
+  }
+
+  static Color _moodColor(String? mood) {
+    switch (mood) {
+      case 'happy':   return const Color(0xFFFBBF24);
+      case 'calm':    return const Color(0xFF34D399);
+      case 'anxious': return const Color(0xFFF97316);
+      case 'sad':     return const Color(0xFF60A5FA);
+      case 'angry':   return const Color(0xFFEF4444);
+      case 'tired':   return const Color(0xFF8B5CF6);
+      default:        return const Color(0xFFE5E7EB);
+    }
+  }
+
+  static String _moodEmoji(String mood) {
+    switch (mood) {
+      case 'happy':   return '😊';
+      case 'calm':    return '😌';
+      case 'anxious': return '😰';
+      case 'sad':     return '😢';
+      case 'angry':   return '😠';
+      case 'tired':   return '😴';
+      default:        return '';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _ctrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
-    _fadeAnim =
-        CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _fadeAnim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
-    _loadTodayLog();
+    _loadData();
   }
 
   @override
@@ -57,13 +93,33 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
     super.dispose();
   }
 
-  Future<void> _loadTodayLog() async {
+  Future<void> _loadData() async {
     final log = await _repo.getTodayMoodLog();
-    if (mounted && log != null) {
+    final logs = await _repo.getMoodLogsLast7Days();
+    if (mounted) {
       setState(() {
         _todayLog = log;
-        _selectedMood = log['mood'] as String?;
-        _noteCtrl.text = (log['note'] as String?) ?? '';
+        if (log != null) {
+          _selectedMood = log['mood'] as String?;
+          _noteCtrl.text = (log['note'] as String?) ?? '';
+        }
+        _moodLogs = logs;
+      });
+    }
+  }
+
+  void _onMoodTapped(String key) {
+    setState(() => _selectedMood = key);
+    if (key == 'sad' || key == 'anxious') {
+      Future.delayed(const Duration(milliseconds: 120), () {
+        if (mounted) {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            builder: (_) => const _LumiHugSheet(),
+          );
+        }
       });
     }
   }
@@ -121,10 +177,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
           opacity: _fadeAnim,
           child: Column(
             children: [
-              // ── Header ──────────────────────────────────────────
               _buildHeader(l10n),
-
-              // ── Content ─────────────────────────────────────────
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
@@ -132,17 +185,14 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      // Already logged today notice
                       if (_todayLog != null) ...[
                         _buildAlreadyLoggedBanner(l10n),
                         const SizedBox(height: 20),
                       ],
 
-                      // Prompt
                       Text(
                         l10n.moodTrackerPrompt,
-                        style: FemoraTextStyles.headlineMedium
-                            .copyWith(
+                        style: FemoraTextStyles.headlineMedium.copyWith(
                           color: FemoraColors.textPrimary,
                           fontWeight: FontWeight.w800,
                         ),
@@ -158,31 +208,25 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
 
                       const SizedBox(height: 28),
 
-                      // ── Mood grid ──────────────────────────────
+                      // ── Mood grid ────────────────────────────────────────
                       GridView.count(
                         crossAxisCount: 3,
                         shrinkWrap: true,
-                        physics:
-                            const NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                         childAspectRatio: 0.95,
                         children: _moods.map((m) {
-                          final selected =
-                              _selectedMood == m.key;
+                          final selected = _selectedMood == m.key;
                           return GestureDetector(
-                            onTap: () => setState(
-                                () => _selectedMood = m.key),
+                            onTap: () => _onMoodTapped(m.key),
                             child: AnimatedContainer(
-                              duration: const Duration(
-                                  milliseconds: 180),
+                              duration: const Duration(milliseconds: 180),
                               decoration: BoxDecoration(
                                 color: selected
                                     ? m.color.withOpacity(0.12)
-                                    : FemoraColors
-                                        .lightBackgroundTint,
-                                borderRadius:
-                                    BorderRadius.circular(16),
+                                    : FemoraColors.lightBackgroundTint,
+                                borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: selected
                                       ? m.color
@@ -191,29 +235,25 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
                                 ),
                               ),
                               child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Emoji with scale animation
                                   AnimatedScale(
                                     scale: selected ? 1.2 : 1.0,
-                                    duration: const Duration(
-                                        milliseconds: 180),
+                                    duration:
+                                        const Duration(milliseconds: 180),
                                     child: Text(
                                       m.emoji,
-                                      style: const TextStyle(
-                                          fontSize: 36),
+                                      style:
+                                          const TextStyle(fontSize: 36),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     _moodLabel(context, m.key),
-                                    style: FemoraTextStyles.caption
-                                        .copyWith(
+                                    style: FemoraTextStyles.caption.copyWith(
                                       color: selected
                                           ? m.color
-                                          : FemoraColors
-                                              .textSecondary,
+                                          : FemoraColors.textSecondary,
                                       fontWeight: selected
                                           ? FontWeight.w700
                                           : FontWeight.w500,
@@ -226,9 +266,14 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
                         }).toList(),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
 
-                      // ── Note field ─────────────────────────────
+                      // ── 7-day mood pattern graph ──────────────────────────
+                      _buildMoodGraph(),
+
+                      const SizedBox(height: 28),
+
+                      // ── Note field ────────────────────────────────────────
                       Text(
                         'Add a note',
                         style: FemoraTextStyles.bodyLarge.copyWith(
@@ -262,14 +307,11 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
 
                       const SizedBox(height: 32),
 
-                      // ── Save button ────────────────────────────
+                      // ── Save button ───────────────────────────────────────
                       GestureDetector(
-                        onTap: _selectedMood != null
-                            ? _save
-                            : null,
+                        onTap: _selectedMood != null ? _save : null,
                         child: AnimatedContainer(
-                          duration:
-                              const Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 200),
                           width: double.infinity,
                           height: 54,
                           decoration: BoxDecoration(
@@ -278,8 +320,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
                                 : _selectedMood != null
                                     ? FemoraColors.primary
                                     : FemoraColors.neutralLight,
-                            borderRadius:
-                                BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16),
                             boxShadow: _selectedMood != null
                                 ? [
                                     BoxShadow(
@@ -296,8 +337,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
                                 ? const SizedBox(
                                     width: 22,
                                     height: 22,
-                                    child:
-                                        CircularProgressIndicator(
+                                    child: CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 2.5,
                                     ),
@@ -305,12 +345,10 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
                                 : _savedSuccessfully
                                     ? Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment
-                                                .center,
+                                            MainAxisAlignment.center,
                                         children: [
                                           const Icon(
-                                            Icons
-                                                .check_circle_rounded,
+                                            Icons.check_circle_rounded,
                                             color: Colors.white,
                                             size: 20,
                                           ),
@@ -321,24 +359,19 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
                                                 .bodyLarge
                                                 .copyWith(
                                               color: Colors.white,
-                                              fontWeight:
-                                                  FontWeight.w700,
+                                              fontWeight: FontWeight.w700,
                                             ),
                                           ),
                                         ],
                                       )
                                     : Text(
                                         l10n.saveButton,
-                                        style: FemoraTextStyles
-                                            .bodyLarge
+                                        style: FemoraTextStyles.bodyLarge
                                             .copyWith(
-                                          color: _selectedMood !=
-                                                  null
+                                          color: _selectedMood != null
                                               ? Colors.white
-                                              : FemoraColors
-                                                  .textSecondary,
-                                          fontWeight:
-                                              FontWeight.w700,
+                                              : FemoraColors.textSecondary,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
                           ),
@@ -364,6 +397,149 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
       ),
     );
   }
+
+  // ── 7-day mood pattern graph ──────────────────────────────────────────────
+
+  Widget _buildMoodGraph() {
+    final now = DateTime.now();
+
+    // Map each of the last 7 days (index 0 = oldest, 6 = today)
+    // to the most recent mood logged on that calendar day.
+    final dayMoods = <int, Map<String, dynamic>>{};
+    for (final log in _moodLogs) {
+      final dt = DateTime.tryParse(log['logged_at'] as String? ?? '');
+      if (dt == null) continue;
+      final dayDiff = DateTime(now.year, now.month, now.day)
+          .difference(DateTime(dt.year, dt.month, dt.day))
+          .inDays;
+      if (dayDiff < 0 || dayDiff >= 7) continue;
+      final idx = 6 - dayDiff;
+      dayMoods.putIfAbsent(idx, () => log);
+    }
+
+    const maxBarH = 72.0;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F5FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE9D8FD)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.insights_rounded,
+                  color: Color(0xFF8B5CF6), size: 16),
+              const SizedBox(width: 6),
+              Text(
+                'Mood This Week',
+                style: FemoraTextStyles.bodyMedium.copyWith(
+                  color: FemoraColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const Spacer(),
+              if (_moodLogs.isEmpty)
+                Text(
+                  'Log your mood to see patterns',
+                  style: FemoraTextStyles.caption.copyWith(
+                    color: FemoraColors.textSecondary,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(7, (i) {
+              final date = now.subtract(Duration(days: 6 - i));
+              final log = dayMoods[i];
+              final mood = log?['mood'] as String?;
+              final score = mood != null ? _moodScore(mood) : 0;
+              final barH =
+                  score > 0 ? (score / 5) * maxBarH : 4.0;
+              final barColor = _moodColor(mood);
+              final dayAbbr = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri',
+                  'Sat', 'Sun'][date.weekday - 1];
+              final isToday = date.day == now.day &&
+                  date.month == now.month;
+
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    mood != null ? _moodEmoji(mood) : '',
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                  const SizedBox(height: 3),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 450),
+                    curve: Curves.easeOut,
+                    width: 28,
+                    height: barH,
+                    decoration: BoxDecoration(
+                      color: barColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    dayAbbr,
+                    style: FemoraTextStyles.caption.copyWith(
+                      color: isToday
+                          ? const Color(0xFF8B5CF6)
+                          : FemoraColors.textSecondary,
+                      fontWeight: isToday
+                          ? FontWeight.w700
+                          : FontWeight.w400,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              _legendItem(const Color(0xFFFBBF24), '😊 Happy'),
+              _legendItem(const Color(0xFF34D399), '😌 Calm'),
+              _legendItem(const Color(0xFFF97316), '😰 Anxious'),
+              _legendItem(const Color(0xFF60A5FA), '😢 Sad'),
+              _legendItem(const Color(0xFFEF4444), '😠 Angry'),
+              _legendItem(const Color(0xFF8B5CF6), '😴 Tired'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _legendItem(Color color, String label) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+      const SizedBox(width: 4),
+      Text(
+        label,
+        style: FemoraTextStyles.caption.copyWith(
+          color: FemoraColors.textSecondary,
+          fontSize: 10,
+        ),
+      ),
+    ],
+  );
 
   // ── Header ────────────────────────────────────────────────────────────────
 
@@ -412,8 +588,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
 
   Widget _buildAlreadyLoggedBanner(AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: FemoraColors.lavenderWhisper,
         borderRadius: BorderRadius.circular(12),
@@ -437,7 +612,100 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen>
   }
 }
 
-// ── Mood option model ─────────────────────────────────────────────────────────
+// ── Lumi Hug Bottom Sheet ─────────────────────────────────────────────────────
+
+class _LumiHugSheet extends StatelessWidget {
+  const _LumiHugSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: const EdgeInsets.fromLTRB(28, 20, 28, 40),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5E7EB),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Lumi caring image
+          Image.asset(
+            'assets/images/lumi/lumi_caring.png',
+            height: 130,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 20),
+
+          const Text(
+            'Femi sends you a hug 💜',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF1F1235),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'It\'s okay to not feel okay.\nYou\'re not alone — and you\'re stronger\nthan you think. Take a deep breath. 🌸',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+              height: 1.65,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 28),
+
+          // Close button
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: double.infinity,
+              height: 52,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF8B5CF6), Color(0xFFD946EF)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF8B5CF6).withOpacity(0.30),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Text(
+                  'Thank you, Femi 💜',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Mood option model ──────────────────────────────────────────────────────────
 
 class _MoodOption {
   final String key;

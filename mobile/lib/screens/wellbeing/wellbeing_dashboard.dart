@@ -10,6 +10,7 @@ import 'breathing_screen.dart';
 import 'music_screen.dart';
 import 'library_screen.dart';
 import 'crisis_screen.dart';
+import 'sleep_tracker_screen.dart';
 
 /// Wellbeing Dashboard
 /// ────────────────────
@@ -83,6 +84,7 @@ class _WellbeingDashboardState extends State<WellbeingDashboard> {
   void _openBreathing() => _goTo(const BreathingScreen());
   void _openMusic() => _goTo(const MusicScreen());
   void _openLibrary() => _goTo(const LibraryScreen());
+  void _openSleepTracker() => _goTo(const SleepTrackerScreen());
   void _openCrisis() => _goTo(const CrisisScreen());
 
   void _openPHQ2() {
@@ -532,7 +534,7 @@ class _WellbeingDashboardState extends State<WellbeingDashboard> {
         label: l10n.sleepTitle,
         subtitle: 'Track your sleep',
         color: const Color(0xFF8B5CF6),
-        onTap: _openMoodTracker,
+        onTap: _openSleepTracker,
       ),
     ];
 

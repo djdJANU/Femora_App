@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Period tracker card widget for the home screen
 /// Shows period tracking information with an image and CTA button
@@ -75,7 +76,8 @@ class PeriodTrackerCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Track your cycle and get personalized insights',
+                  AppLocalizations.of(context)?.homePeriodDescription ??
+                      'Track your cycle and get personalized insights',
                   style: FemoraTextStyles.bodyMedium.copyWith(
                     color: FemoraColors.textPrimary,
                     height: 1.4,
@@ -108,7 +110,8 @@ class PeriodTrackerCard extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        'Get started',
+                        AppLocalizations.of(context)?.homeGetStarted ??
+                            'Get started',
                         style: FemoraTextStyles.titleLarge.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,

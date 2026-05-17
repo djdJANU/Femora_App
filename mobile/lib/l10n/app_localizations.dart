@@ -705,6 +705,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'These calls are confidential. Your safety and privacy matter.'**
   String get crisisPrivacyNote;
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey, {name}'**
+  String homeGreeting(String name);
+
+  /// No description provided for @homeWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Femora'**
+  String get homeWelcome;
+
+  /// No description provided for @homeFemiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to Femi 💜'**
+  String get homeFemiTitle;
+
+  /// No description provided for @homeFemiSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your AI wellness companion — ask me anything about your health, mood, or cycle.'**
+  String get homeFemiSubtitle;
+
+  /// No description provided for @homeFemiButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat now →'**
+  String get homeFemiButton;
+
+  /// No description provided for @homeSectionPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Period Tracker'**
+  String get homeSectionPeriod;
+
+  /// No description provided for @homeSectionPregnancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Pregnancy'**
+  String get homeSectionPregnancy;
+
+  /// No description provided for @homeViewMore.
+  ///
+  /// In en, this message translates to:
+  /// **'view more'**
+  String get homeViewMore;
+
+  /// No description provided for @homePeriodDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your cycle and get personalized insights'**
+  String get homePeriodDescription;
+
+  /// No description provided for @homeGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get homeGetStarted;
+
+  /// No description provided for @homeChooseMood.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your mood'**
+  String get homeChooseMood;
+
+  /// No description provided for @homePregnancyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your pregnancy period with Femora'**
+  String get homePregnancyDescription;
 }
 
 class _AppLocalizationsDelegate

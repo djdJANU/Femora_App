@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Greeting header widget for the home screen
 /// Shows user's name and welcome message with profile avatar
 class GreetingHeader extends StatelessWidget {
   final String userName;
   final String? avatarImagePath;
+  final String? avatarUrl;
   final VoidCallback? onAvatarTap;
 
   const GreetingHeader({
     super.key,
     required this.userName,
     this.avatarImagePath,
+    this.avatarUrl,
     this.onAvatarTap,
   });
 
@@ -27,7 +30,8 @@ class GreetingHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hey, $userName',
+                AppLocalizations.of(context)?.homeGreeting(userName) ??
+                    'Hey, $userName',
                 style: FemoraTextStyles.headlineLarge.copyWith(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -36,7 +40,8 @@ class GreetingHeader extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Welcome to Femora',
+                AppLocalizations.of(context)?.homeWelcome ??
+                    'Welcome to Femora',
                 style: FemoraTextStyles.bodyMedium.copyWith(
                   fontSize: 14,
                   color: FemoraColors.textSecondary,
@@ -67,14 +72,21 @@ class GreetingHeader extends StatelessWidget {
               ],
             ),
             child: ClipOval(
-              child: avatarImagePath != null
-                  ? Image.asset(
-                      avatarImagePath!,
+              child: avatarUrl != null && avatarUrl!.isNotEmpty
+                  ? Image.network(
+                      avatarUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _buildDefaultAvatar(),
+                      width: 56,
+                      height: 56,
+                      errorBuilder: (_, _, _) => _buildDefaultAvatar(),
                     )
-                  : _buildDefaultAvatar(),
+                  : avatarImagePath != null
+                      ? Image.asset(
+                          avatarImagePath!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => _buildDefaultAvatar(),
+                        )
+                      : _buildDefaultAvatar(),
             ),
           ),
         ),

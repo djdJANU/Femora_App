@@ -1,8 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../config/app_theme.dart';
 import '../../config/supabase_config.dart';
 import '../../providers/locale_provider.dart';
@@ -24,6 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   final _supabase = SupabaseConfig.client;
 
   Map<String, dynamic>? _profile;
+  String? _avatarUrl;
   bool _isLoading = true;
   bool _isSigningOut = false;
 
@@ -58,6 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       if (mounted) {
         setState(() {
           _profile = response;
+          _avatarUrl = response?['avatar_url'] as String?;
           _isLoading = false;
         });
         _fadeCtrl.forward();
@@ -258,33 +263,55 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildAvatarSection() {
     final name = (_profile?['full_name'] as String?)?.trim() ?? '';
     final email = _supabase.auth.currentUser?.email ?? '';
-    final initials = name.isNotEmpty
-        ? name.trim().split(' ').map((w) => w[0]).take(2).join().toUpperCase()
-        : email.isNotEmpty
-            ? email[0].toUpperCase()
-            : 'F';
 
     return Column(children: [
-      // Avatar circle
-      Container(
-        width: 86,
-        height: 86,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: FemoraColors.primary.withOpacity(0.12),
-          border: Border.all(
-            color: FemoraColors.primary.withOpacity(0.3),
-            width: 2.5,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            initials,
-            style: FemoraTextStyles.headlineLarge.copyWith(
-              color: FemoraColors.primary,
-              fontWeight: FontWeight.w800,
+      // Tappable avatar with camera badge
+      GestureDetector(
+        onTap: _showAvatarOptions,
+        child: Stack(
+          children: [
+            Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: FemoraColors.primary.withOpacity(0.12),
+                border: Border.all(
+                  color: FemoraColors.primary.withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+              child: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                  ? ClipOval(
+                      child: Image.network(
+                        _avatarUrl!,
+                        fit: BoxFit.cover,
+                        width: 90,
+                        height: 90,
+                        errorBuilder: (_, _, _) => _buildAvatarInitials(name, email),
+                      ),
+                    )
+                  : _buildAvatarInitials(name, email),
             ),
-          ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: FemoraColors.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: const Icon(
+                  Icons.camera_alt_rounded,
+                  color: Colors.white,
+                  size: 14,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       const SizedBox(height: 12),
@@ -303,9 +330,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       // Email
       Text(
         email,
-        style: FemoraTextStyles.caption.copyWith(
-          color: _textSecondary,
-        ),
+        style: FemoraTextStyles.caption.copyWith(color: _textSecondary),
       ),
 
       // Date of birth if set
@@ -314,12 +339,203 @@ class _ProfileScreenState extends State<ProfileScreen>
         Text(
           DateFormat('MMMM d, yyyy').format(
               DateTime.parse(_profile!['date_of_birth'])),
-          style: FemoraTextStyles.caption.copyWith(
-            color: _textSecondary,
-          ),
+          style: FemoraTextStyles.caption.copyWith(color: _textSecondary),
         ),
       ],
     ]);
+  }
+
+  Widget _buildAvatarInitials(String name, String email) {
+    final initials = name.isNotEmpty
+        ? name.trim().split(' ').map((w) => w[0]).take(2).join().toUpperCase()
+        : email.isNotEmpty
+            ? email[0].toUpperCase()
+            : 'F';
+    return Center(
+      child: Text(
+        initials,
+        style: FemoraTextStyles.headlineLarge.copyWith(
+          color: FemoraColors.primary,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+
+  void _showAvatarOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: _cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40, height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: _textSecondary.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Text('Profile Photo',
+              style: FemoraTextStyles.titleLarge.copyWith(
+                color: _textPrimary,
+                fontWeight: FontWeight.w700,
+              )),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Container(
+                width: 42, height: 42,
+                decoration: BoxDecoration(
+                  color: FemoraColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.photo_library_rounded,
+                  color: FemoraColors.primary, size: 22),
+              ),
+              title: Text('Choose from Gallery',
+                style: FemoraTextStyles.bodyMedium.copyWith(color: _textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: Container(
+                width: 42, height: 42,
+                decoration: BoxDecoration(
+                  color: FemoraColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.camera_alt_rounded,
+                  color: FemoraColors.primary, size: 22),
+              ),
+              title: Text('Take Photo',
+                style: FemoraTextStyles.bodyMedium.copyWith(color: _textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadImage(ImageSource.camera);
+              },
+            ),
+            if (_avatarUrl != null && _avatarUrl!.isNotEmpty)
+              ListTile(
+                leading: Container(
+                  width: 42, height: 42,
+                  decoration: BoxDecoration(
+                    color: FemoraColors.error.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.delete_outline_rounded,
+                    color: FemoraColors.error, size: 22),
+                ),
+                title: Text('Remove Photo',
+                  style: FemoraTextStyles.bodyMedium.copyWith(
+                    color: FemoraColors.error)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteAvatar();
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndUploadImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: source,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 80,
+      );
+      if (picked == null) return;
+
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) return;
+
+      final file = File(picked.path);
+      final ext = picked.path.split('.').last.toLowerCase();
+      final fileName = '$userId/avatar.$ext';
+
+      await _supabase.storage
+          .from('avatars')
+          .upload(fileName, file,
+              fileOptions: const FileOptions(upsert: true));
+
+      final url = _supabase.storage.from('avatars').getPublicUrl(fileName);
+      final cacheBustedUrl = '$url?t=${DateTime.now().millisecondsSinceEpoch}';
+
+      await _supabase
+          .from('profiles')
+          .update({'avatar_url': cacheBustedUrl})
+          .eq('id', userId);
+
+      if (mounted) {
+        setState(() => _avatarUrl = cacheBustedUrl);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile photo updated'),
+            backgroundColor: FemoraColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('_pickAndUploadImage error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not update photo. Please try again.'),
+            backgroundColor: FemoraColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteAvatar() async {
+    try {
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) return;
+
+      final files = await _supabase.storage.from('avatars').list(path: userId);
+      for (final f in files) {
+        await _supabase.storage.from('avatars').remove(['$userId/${f.name}']);
+      }
+
+      await _supabase
+          .from('profiles')
+          .update({'avatar_url': null}).eq('id', userId);
+
+      if (mounted) {
+        setState(() => _avatarUrl = null);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile photo removed'),
+            backgroundColor: FemoraColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('_deleteAvatar error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not remove photo. Please try again.'),
+            backgroundColor: FemoraColors.error,
+          ),
+        );
+      }
+    }
   }
 
   // ── Section container ─────────────────────────────────────────────────────
@@ -907,57 +1123,102 @@ class _SavedScreenState extends State<_SavedScreen>
         return;
       }
 
-      // Fetch saved articles with full article data joined
-      final response = await _supabase
+      // Articles: two-step fetch (same pattern as library_screen)
+      final savedRows = await _supabase
           .from('mental_saved_articles')
+          .select('article_id')
+          .eq('user_id', userId);
+
+      final articleIds = (savedRows as List)
+          .map((r) => r['article_id'].toString())
+          .where((id) => id.isNotEmpty)
+          .toList();
+      debugPrint('_SavedScreen articleIds: $articleIds');
+
+      List<Map<String, dynamic>> articles = [];
+      if (articleIds.isNotEmpty) {
+        final fetched = await _supabase
+            .from('library_articles')
+            .select()
+            .inFilter('id', articleIds);
+        articles = (fetched as List)
+            .where((a) => a['is_published'] != false)
+            .map((a) => Map<String, dynamic>.from(a))
+            .toList();
+      }
+
+      // Posts: fetch liked posts, then resolve author names separately
+      // (community_posts has no FK to profiles, so nested join is not possible)
+      final postsResponse = await _supabase
+          .from('post_likes')
           .select('''
-            id,
-            saved_at,
-            article_id,
-            library_articles (
+            post_id,
+            created_at,
+            community_posts!post_likes_post_id_fkey (
               id,
-              title,
-              category,
               content,
-              read_time_minutes,
-              is_published
+              category,
+              language,
+              is_anonymous,
+              likes_count,
+              comments_count,
+              created_at,
+              image_url,
+              user_id
             )
           ''')
           .eq('user_id', userId)
-          .order('saved_at', ascending: false);
+          .order('created_at', ascending: false);
 
-      final List<Map<String, dynamic>> articles = [];
-      for (final row in response as List) {
-        final article = row['library_articles'];
-        if (article == null) continue;
-        if (article['is_published'] == false) continue;
-        articles.add({
-          'id': article['id'],
-          'title': article['title'] ?? 'Untitled',
-          'category': article['category'] ?? 'general',
-          'content': article['content'] ?? '',
-          'read_time_minutes': article['read_time_minutes'] ?? 5,
-          'saved_at': row['saved_at'],
-          'article_id': row['article_id'],
+      debugPrint('_SavedScreen postsResponse length: ${(postsResponse as List).length}');
+      final List<Map<String, dynamic>> rawPosts = [];
+      for (final row in postsResponse as List) {
+        final post = row['community_posts'];
+        if (post == null) continue;
+        rawPosts.add({
+          ...Map<String, dynamic>.from(post),
+          'liked_at': row['created_at'],
         });
       }
 
-      // Fetch liked posts
-      final posts = await _supabase
-          .from('post_likes')
-          .select('post_id, community_posts(id, content, is_anonymous, created_at)')
-          .eq('user_id', userId)
-          .order('created_at', ascending: false);
+      // Resolve author names for non-anonymous posts
+      final nonAnonIds = rawPosts
+          .where((p) => !(p['is_anonymous'] as bool? ?? false))
+          .map((p) => p['user_id'] as String?)
+          .whereType<String>()
+          .toSet()
+          .toList();
+
+      Map<String, String> nameMap = {};
+      if (nonAnonIds.isNotEmpty) {
+        final profileRows = await _supabase
+            .from('profiles')
+            .select('id, full_name')
+            .inFilter('id', nonAnonIds);
+        for (final p in profileRows as List) {
+          nameMap[p['id'] as String] = (p['full_name'] as String?) ?? '';
+        }
+      }
+
+      final List<Map<String, dynamic>> posts = rawPosts.map((post) {
+        return {
+          ...post,
+          'author_name': (post['is_anonymous'] as bool? ?? false)
+              ? null
+              : nameMap[post['user_id'] as String?],
+        };
+      }).toList();
 
       if (mounted) {
         setState(() {
           _articles = articles;
-          _savedPosts = List<Map<String, dynamic>>.from(posts);
+          _savedPosts = posts;
           _loading = false;
         });
       }
-    } catch (e) {
-      debugPrint('_SavedScreen._load error: $e');
+    } catch (e, stack) {
+      debugPrint('_SavedScreen._load ERROR: $e');
+      debugPrint('_SavedScreen._load STACK: $stack');
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -1053,10 +1314,14 @@ class _SavedScreenState extends State<_SavedScreen>
         final article = _articles[i];
         final title = article['title'] as String? ?? 'Untitled';
         final category = article['category'] as String? ?? '';
-        final readTime = article['read_time_minutes'] as int? ?? 5;
-        final subtitle = category.isNotEmpty
-            ? '$category • $readTime min read'
-            : '$readTime min read';
+        final readTime = article['read_time'] as String? ?? '';
+        final subtitle = category.isNotEmpty && readTime.isNotEmpty
+            ? '$category • $readTime'
+            : category.isNotEmpty
+                ? category
+                : readTime.isNotEmpty
+                    ? readTime
+                    : 'Article';
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -1112,13 +1377,13 @@ class _SavedScreenState extends State<_SavedScreen>
       itemCount: _savedPosts.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, i) {
-        final post = _savedPosts[i]['community_posts']
-            as Map<String, dynamic>?;
-        if (post == null) return const SizedBox.shrink();
+        final post = _savedPosts[i];
         final isAnon = post['is_anonymous'] as bool? ?? false;
         final author = isAnon
-            ? (post['anonymous_alias'] as String? ?? 'Anonymous')
-            : 'Community Member';
+            ? 'Anonymous'
+            : (post['author_name'] as String? ?? 'Community Member');
+        final likes = (post['likes_count'] as num?)?.toInt() ?? 0;
+        final initial = isAnon ? '?' : author[0].toUpperCase();
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -1139,8 +1404,7 @@ class _SavedScreenState extends State<_SavedScreen>
                     shape: BoxShape.circle,
                   ),
                   child: Center(
-                    child: Text(
-                      isAnon ? '?' : author[0].toUpperCase(),
+                    child: Text(initial,
                       style: FemoraTextStyles.caption.copyWith(
                         color: FemoraColors.primary,
                         fontWeight: FontWeight.w700,
@@ -1149,11 +1413,20 @@ class _SavedScreenState extends State<_SavedScreen>
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(author,
+                Expanded(
+                  child: Text(author,
                     style: FemoraTextStyles.caption.copyWith(
                       color: _textSecondary,
                       fontWeight: FontWeight.w600,
                     )),
+                ),
+                Icon(Icons.favorite_rounded,
+                    color: FemoraColors.primary.withValues(alpha: 0.6),
+                    size: 14),
+                const SizedBox(width: 4),
+                Text('$likes',
+                    style: FemoraTextStyles.caption
+                        .copyWith(color: _textSecondary)),
               ]),
               const SizedBox(height: 8),
               Text(post['content'] as String? ?? '',

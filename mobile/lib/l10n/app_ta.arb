@@ -130,5 +130,19 @@
   "crisisBannerHigh": "உங்களுக்கு கொஞ்சம் ஆதரவு தேவைப்படலாம். தயவுசெய்து தொடர்பு கொள்ளுங்கள்.",
   "crisisBannerLink": "ஆதரவு வளங்களை பாருங்கள் →",
   "crisisEncouragement": "உதவி கேட்பது பலவீனத்தின் அறிகுறி அல்ல — அது வலிமையின் அறிகுறி.",
-  "crisisPrivacyNote": "இந்த அழைப்புகள் இரகசியமானவை. உங்கள் பாதுகாப்பும் தனியுரிமையும் முக்கியம்."
+  "crisisPrivacyNote": "இந்த அழைப்புகள் இரகசியமானவை. உங்கள் பாதுகாப்பும் தனியுரிமையும் முக்கியம்.",
+
+  "homeGreeting": "வணக்கம், {name}",
+  "@homeGreeting": { "placeholders": { "name": { "type": "String" } } },
+  "homeWelcome": "Femora-க்கு வரவேற்கிறோம்",
+  "homeFemiTitle": "Femi-யிடம் பேசுங்கள் 💜",
+  "homeFemiSubtitle": "உங்கள் AI ஆரோக்கிய துணை — உடல்நலம், மனநிலை அல்லது மாதவிடாய் சுழற்சி பற்றி எதையும் கேளுங்கள்.",
+  "homeFemiButton": "இப்போது பேசுங்கள் →",
+  "homeSectionPeriod": "மாதவிடாய் கண்காணிப்பு",
+  "homeSectionPregnancy": "கர்ப்பம்",
+  "homeViewMore": "மேலும் காணவும்",
+  "homePeriodDescription": "உங்கள் மாதவிடாய் சுழற்சியை கண்காணித்து தனிப்பயன் நுண்ணறிவு பெறுங்கள்",
+  "homeGetStarted": "தொடங்குங்கள்",
+  "homeChooseMood": "உங்கள் மனநிலையை தேர்வு செய்யுங்கள்",
+  "homePregnancyDescription": "Femora-வில் உங்கள் கர்ப்பகால காலத்தை கண்காணியுங்கள்"
 }

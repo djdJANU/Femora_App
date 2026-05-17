@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 enum MoodType { happy, angry, sad }
 
@@ -79,7 +80,7 @@ class _MentalWellbeingSectionState extends State<MentalWellbeingSection> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Choose your mood',
+            AppLocalizations.of(context)?.homeChooseMood ?? 'Choose your mood',
             style: FemoraTextStyles.titleLarge.copyWith(
               color: FemoraColors.textPrimary,
               fontWeight: FontWeight.w600,

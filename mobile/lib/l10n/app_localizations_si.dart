@@ -330,4 +330,44 @@ class AppLocalizationsSi extends AppLocalizations {
   @override
   String get crisisPrivacyNote =>
       'මෙම ඇමතුම් රහස්‍යභාවයෙන් යුතුය. ඔබගේ ආරක්ෂාව සහ පුද්ගලිකත්වය වැදගත් වේ.';
+
+  @override
+  String homeGreeting(String name) {
+    return 'ආයුබෝ, $name';
+  }
+
+  @override
+  String get homeWelcome => 'Femora වෙත සාදරයෙන් පිළිගනිමු';
+
+  @override
+  String get homeFemiTitle => 'Femi සමඟ කතා කරන්න 💜';
+
+  @override
+  String get homeFemiSubtitle =>
+      'ඔබගේ AI සෞඛ්‍ය සහකාරිය — ඔබගේ සෞඛ්‍යය, මනෝභාවය හෝ ඔසප් චක්‍රය ගැන ඕනෑම දෙයක් අසන්න.';
+
+  @override
+  String get homeFemiButton => 'දැන් කතා කරන්න →';
+
+  @override
+  String get homeSectionPeriod => 'ඔසප් සොයාගැනීම';
+
+  @override
+  String get homeSectionPregnancy => 'ගර්භනී භාවය';
+
+  @override
+  String get homeViewMore => 'තව බලන්න';
+
+  @override
+  String get homePeriodDescription =>
+      'ඔබගේ ඔසප් චක්‍රය සොයාගෙන පෞද්ගලිකරණ ලද ඉඟි ලබාගන්න';
+
+  @override
+  String get homeGetStarted => 'ආරම්භ කරන්න';
+
+  @override
+  String get homeChooseMood => 'ඔබගේ මනෝභාවය තෝරන්න';
+
+  @override
+  String get homePregnancyDescription => 'Femora සමඟ ඔබගේ ගර්භනී කාලය සොයාගන්න';
 }

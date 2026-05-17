@@ -52,7 +52,7 @@ class OnboardingCycleScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 18),
                     Text(
-                      'oyata puluwm dn lesiyenma oyge cycle eka track kr gnna apen wage mona hri dnn',
+                      'Welcome 🌸 Track your cycle, understand your body, and stay prepared every day. Your wellness journey starts here',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,

@@ -130,5 +130,19 @@
   "crisisBannerHigh": "It looks like you may need some support. Please reach out.",
   "crisisBannerLink": "See support resources →",
   "crisisEncouragement": "Reaching out is a sign of strength, not weakness.",
-  "crisisPrivacyNote": "These calls are confidential. Your safety and privacy matter."
+  "crisisPrivacyNote": "These calls are confidential. Your safety and privacy matter.",
+
+  "homeGreeting": "Hey, {name}",
+  "@homeGreeting": { "placeholders": { "name": { "type": "String" } } },
+  "homeWelcome": "Welcome to Femora",
+  "homeFemiTitle": "Talk to Femi 💜",
+  "homeFemiSubtitle": "Your AI wellness companion — ask me anything about your health, mood, or cycle.",
+  "homeFemiButton": "Chat now →",
+  "homeSectionPeriod": "Period Tracker",
+  "homeSectionPregnancy": "Pregnancy",
+  "homeViewMore": "view more",
+  "homePeriodDescription": "Track your cycle and get personalized insights",
+  "homeGetStarted": "Get started",
+  "homeChooseMood": "Choose your mood",
+  "homePregnancyDescription": "Track your pregnancy period with Femora"
 }

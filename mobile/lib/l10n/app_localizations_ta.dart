@@ -331,4 +331,45 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get crisisPrivacyNote =>
       'இந்த அழைப்புகள் இரகசியமானவை. உங்கள் பாதுகாப்பும் தனியுரிமையும் முக்கியம்.';
+
+  @override
+  String homeGreeting(String name) {
+    return 'வணக்கம், $name';
+  }
+
+  @override
+  String get homeWelcome => 'Femora-க்கு வரவேற்கிறோம்';
+
+  @override
+  String get homeFemiTitle => 'Femi-யிடம் பேசுங்கள் 💜';
+
+  @override
+  String get homeFemiSubtitle =>
+      'உங்கள் AI ஆரோக்கிய துணை — உடல்நலம், மனநிலை அல்லது மாதவிடாய் சுழற்சி பற்றி எதையும் கேளுங்கள்.';
+
+  @override
+  String get homeFemiButton => 'இப்போது பேசுங்கள் →';
+
+  @override
+  String get homeSectionPeriod => 'மாதவிடாய் கண்காணிப்பு';
+
+  @override
+  String get homeSectionPregnancy => 'கர்ப்பம்';
+
+  @override
+  String get homeViewMore => 'மேலும் காணவும்';
+
+  @override
+  String get homePeriodDescription =>
+      'உங்கள் மாதவிடாய் சுழற்சியை கண்காணித்து தனிப்பயன் நுண்ணறிவு பெறுங்கள்';
+
+  @override
+  String get homeGetStarted => 'தொடங்குங்கள்';
+
+  @override
+  String get homeChooseMood => 'உங்கள் மனநிலையை தேர்வு செய்யுங்கள்';
+
+  @override
+  String get homePregnancyDescription =>
+      'Femora-வில் உங்கள் கர்ப்பகால காலத்தை கண்காணியுங்கள்';
 }

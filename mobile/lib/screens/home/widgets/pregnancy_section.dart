@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Pregnancy section widget for the home screen
 /// Shows pregnancy tracking information with an image and CTA button
@@ -77,7 +78,8 @@ class PregnancySection extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Track your pregnancy period with femora',
+                  AppLocalizations.of(context)?.homePregnancyDescription ??
+                      'Track your pregnancy period with Femora',
                   style: FemoraTextStyles.bodyMedium.copyWith(
                     color: FemoraColors.textPrimary,
                     height: 1.4,
@@ -110,7 +112,8 @@ class PregnancySection extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        'Get started',
+                        AppLocalizations.of(context)?.homeGetStarted ??
+                            'Get started',
                         style: FemoraTextStyles.titleLarge.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,

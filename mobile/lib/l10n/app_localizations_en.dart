@@ -330,4 +330,45 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get crisisPrivacyNote =>
       'These calls are confidential. Your safety and privacy matter.';
+
+  @override
+  String homeGreeting(String name) {
+    return 'Hey, $name';
+  }
+
+  @override
+  String get homeWelcome => 'Welcome to Femora';
+
+  @override
+  String get homeFemiTitle => 'Talk to Femi 💜';
+
+  @override
+  String get homeFemiSubtitle =>
+      'Your AI wellness companion — ask me anything about your health, mood, or cycle.';
+
+  @override
+  String get homeFemiButton => 'Chat now →';
+
+  @override
+  String get homeSectionPeriod => 'Period Tracker';
+
+  @override
+  String get homeSectionPregnancy => 'Pregnancy';
+
+  @override
+  String get homeViewMore => 'view more';
+
+  @override
+  String get homePeriodDescription =>
+      'Track your cycle and get personalized insights';
+
+  @override
+  String get homeGetStarted => 'Get started';
+
+  @override
+  String get homeChooseMood => 'Choose your mood';
+
+  @override
+  String get homePregnancyDescription =>
+      'Track your pregnancy period with Femora';
 }

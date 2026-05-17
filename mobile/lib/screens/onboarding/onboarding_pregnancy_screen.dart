@@ -50,7 +50,7 @@ class OnboardingPregnancyScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 18),
                     Text(
-                      'oyata puluwm dn lesiyenma oyge mewwa eka track kr gnna apen wage mona hri dnn',
+                      'A tiny life is growing every day ✨ Keep track of special moments, health changes, and milestones along the way.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,

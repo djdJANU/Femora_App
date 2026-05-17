@@ -21,7 +21,6 @@ class OnboardingWelcomeScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
             children: [
-
               // IMAGE SECTION
               Expanded(
                 flex: 5,
@@ -52,7 +51,7 @@ class OnboardingWelcomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 18),
                     Text(
-                      'Welcome note about femora. mona hri danna methanata ena ekknt asa hithenna',
+                      'Welcome to Femora 💜 Track your wellness, care for your mental wellbeing, stay safe with SOS support, and chat with Femi, your personal AI companion.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,
